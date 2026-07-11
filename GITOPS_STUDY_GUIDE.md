@@ -23,13 +23,12 @@ We split the project into two directories on your local machine:
 ## 2. ArgoCD & Kubernetes Interaction
 ArgoCD operates on the **declarative GitOps model**. Git is the single source of truth; ArgoCD continuously monitors Git and reconciles the live cluster state to match it.
 
-### The "App of Apps" Pattern
-To manage multiple environments without applying dozens of YAML files manually, we bootstrapped a **Root Application** (`timeguild-root`) inside ArgoCD.
-*   **The Root Application** ([app-of-apps.yaml](file:///home/si3mshady/time-guild-gitops/infra/argocd/app-of-apps.yaml)) watches the `/infra/argocd/` directory in the GitOps repo.
-*   Inside `/infra/argocd/`, we have three child Application definitions:
-    1.  [application-dev.yaml](file:///home/si3mshady/time-guild-gitops/infra/argocd/application-dev.yaml) $\rightarrow$ Deploys the Helm chart using `values-dev.yaml` to namespace `timeguild-dev`.
-    2.  [application-staging.yaml](file:///home/si3mshady/time-guild-gitops/infra/argocd/application-staging.yaml) $\rightarrow$ Deploys the Helm chart using `values-lab.yaml` to namespace `timeguild-staging`.
-    3.  [application-prod.yaml](file:///home/si3mshady/time-guild-gitops/infra/argocd/application-prod.yaml) $\rightarrow$ Deploys the Helm chart using `values-prod.yaml` to namespace `timeguild-prod` (configured for manual sync approval).
+### The ApplicationSet Pattern (Dynamic Generation)
+Instead of hardcoding and maintaining static, manual Application files for every namespace (the "App of Apps" pattern), we use the **ApplicationSet controller** to dynamically generate and template environment deployments.
+*   **The ApplicationSets** ([applicationset.yaml](file:///home/si3mshady/time-guild-gitops/infra/applicationsets/applicationset.yaml)) define generators that scan lists of environments and output corresponding Application specs.
+*   We split the setup into two ApplicationSets:
+    1.  `timeguild-auto-environments`: Generates `timeguild-dev` and `timeguild-staging` with automated pruning and self-healing.
+    2.  `timeguild-manual-environments`: Generates `timeguild-prod` with manual sync policy for controlled staging-to-production promotions.
 
 ---
 
@@ -82,5 +81,5 @@ Since search tools can sometimes return outdated or hallucinated URLs, use the f
 2.  **Marketplace Validation**: You can now test account creation and connecting Stripe payouts. We refactored all categories to fully comply with Stripe rules.
 
 ### In the GitOps Directory (`/home/si3mshady/time-guild-gitops`)
-1.  **ArgoCD Bootstrapping**: We successfully applied the "App of Apps" root parent (`app-of-apps.yaml`). This automatically created the dev, staging, and production environments.
+1.  **ApplicationSets Rollout**: We successfully applied the `applicationset.yaml` manifest containing the split ApplicationSets. This dynamically generates the dev, staging, and production environments in the cluster.
 2.  **Production DNS Challenge (Optional)**: When ready to delegate DNS to Cloudflare, swap `clusterissuer.yaml` to authenticate with Let's Encrypt using Cloudflare API tokens (detailed in `day5.md`).
