@@ -1,0 +1,33 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: timeguild-ca
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: "timeguild-ca"
+  secretName: timeguild-ca-key-pair
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-timeguild
+  namespace: kube-system
+spec:
+  secretName: wildcard-tls-secret
+  issuerRef:
+    name: timeguild-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+  commonName: "*.timeguild.local"
+  dnsNames:
+    - "*.timeguild.local"
+    - "timeguild.local"
+    - "*.timeguild.lab"
+    - "timeguild.lab"
+    - "*.timeguild.com"
+    - "timeguild.com"
