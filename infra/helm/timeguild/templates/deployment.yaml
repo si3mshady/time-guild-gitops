@@ -35,6 +35,18 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          {{/*
+          MENTORING NOTE (Port Mismatch):
+          Why does containerPort use `.Values.service.port` instead of hardcoded 3000?
+          Our Next.js application receives the PORT environment variable from the ConfigMap, 
+          which resolves to the Service Port (80). Therefore, the Next.js process starts and 
+          listens on port 80.
+          
+          If the containerPort here is hardcoded to 3000, Kubernetes named port "http" maps to 3000. 
+          When startup/liveness/readiness probes check the named port "http" (3000), they fail because 
+          nothing is listening there, resulting in continuous RunContainerError or CrashLoopBackOff restarts.
+          Mapping containerPort to the dynamic service port solves this mismatch.
+          */}}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -47,6 +59,18 @@ spec:
             - secretRef:
                 name: {{ include "timeguild.fullname" . }}-secrets
           {{- if .Values.persistence.enabled }}
+          {{/*
+          MENTORING NOTE (SQLite subPath Mount Issue):
+          Why did we change mountPath to `/app/data` (directory mount) and remove `subPath`?
+          When you mount a file using `subPath` (like `time_worth.db`) from a Persistent Volume (PV), 
+          Kubernetes expects that file to exist. If the volume is empty (newly provisioned), 
+          Kubernetes creates a DIRECTORY at the destination path named `time_worth.db` on the node, 
+          which then fails to bind as a file in the container.
+          
+          To solve this cleanly, we mount the directory `/app/data` to the PV and define the environment 
+          variable `DB_PATH: /app/data/time_worth.db`. The application automatically creates the SQLite 
+          database file inside that directory, avoiding mounting errors.
+          */}}
           volumeMounts:
             - name: db-storage
               mountPath: {{ .Values.persistence.mountPath }}

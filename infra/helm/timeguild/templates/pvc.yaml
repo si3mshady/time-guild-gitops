@@ -5,6 +5,22 @@ metadata:
   name: {{ include "timeguild.fullname" . }}-db-pvc
   labels:
     {{- include "timeguild.labels" . | nindent 4 }}
+  {{/* 
+  MENTORING NOTE (ArgoCD Sync Wave Deadlock):
+  Why is the sync-wave set to "2" instead of "0"?
+  By default, our local-path storage class uses `volumeBindingMode: WaitForFirstConsumer`. 
+  This means the Persistent Volume Claim (PVC) will remain in a "Pending" state until a Pod (the consumer) 
+  that uses it is scheduled onto a node. 
+  
+  If the PVC is in sync-wave "0" and the Deployment (Pod) is in sync-wave "2", ArgoCD will wait for all 
+  wave "0" resources to be "Healthy" (Bound) before creating wave "2". 
+  But since the PVC cannot bind without the Pod, they deadlock:
+  - ArgoCD waits for PVC (Pending -> never healthy)
+  - Pod is never created to trigger binding.
+  
+  Placing the PVC in wave "2" (same as the Deployment) allows ArgoCD to apply them both simultaneously, 
+  letting the scheduler assign the pod, bind the volume, and clear the sync.
+  */}}
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
