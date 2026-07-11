@@ -32,6 +32,12 @@ spec:
       destination:
         server: 'https://kubernetes.default.svc'
         namespace: 'timeguild-{{env}}'
+      ignoreDifferences:
+        - group: ""
+          kind: Secret
+          name: 'timeguild-{{env}}-secrets'
+          jsonPointers:
+            - /data
       syncPolicy:
         # Evaluate sync policy dynamically based on list element configurations
         {{- if eq "{{syncPolicy}}" "automated" }}
