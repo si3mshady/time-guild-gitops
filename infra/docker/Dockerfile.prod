@@ -1,0 +1,44 @@
+# Stage 1: Dependency Resolver
+FROM oven/bun:1.1.34-slim AS deps
+WORKDIR /app
+
+# Copy package configurations
+COPY package.json bun.lock* ./
+
+# Install dependencies, ignoring native modules compilation scripts
+RUN bun install --frozen-lockfile --ignore-scripts
+
+# Stage 2: Application Builder
+FROM oven/bun:1.1.34-slim AS builder
+WORKDIR /app
+
+# Copy node_modules from dependency resolver and application files
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Set environment for production build
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Disable TS/ESLint build blocks since Next config is set to ignore
+RUN bun run build
+
+# Stage 3: Runner
+FROM oven/bun:1.1.34-slim AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Change ownership of app folder to the pre-existing non-root 'bun' user
+RUN chown -R bun:bun /app
+
+# Switch runtime context to non-root user
+USER bun
+
+EXPOSE 3000
+
+# Execute next server start
+CMD ["bun", "run", "start"]

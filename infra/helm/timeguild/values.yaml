@@ -1,0 +1,90 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/si3mshady/time-guild
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+serviceAccount:
+  create: true
+  name: "timeguild-sa"
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1001
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: timeguild.local
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: "*.timeguild.local"
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: timeguild-tls-secret
+      hosts:
+        - timeguild.local
+        - "*.timeguild.local"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 75
+
+persistence:
+  enabled: true
+  storageClass: "local-path"
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  mountPath: /app/time_worth.db
+  subPath: time_worth.db
+
+networkPolicy:
+  enabled: true
+
+# ConfigMap Environment Variables (Non-Sensitive)
+config:
+  NEXT_PUBLIC_STRIPE_TEST_MODE: "true"
+  SUPABASE_PROJECT_ID: "aisfkmcsqususpgaxmsh"
+  SUPABASE_URL: "https://aisfkmcsqususpgaxmsh.supabase.co"
+
+# Secret Environment Variables (Sensitive)
+# Values below are default lab placeholders, override in environments
+secrets:
+  JWT_SECRET: "timeworth-super-secret-key-321"
+  STRIPE_SECRET_KEY: "sk_test_placeholder"
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_placeholder"
+  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_placeholder"
+  DEEPSEEK_API_KEY: "sk_deepseek_placeholder"

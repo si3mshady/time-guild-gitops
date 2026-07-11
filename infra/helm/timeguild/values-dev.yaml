@@ -1,0 +1,24 @@
+replicaCount: 1
+
+autoscaling:
+  enabled: false
+
+ingress:
+  hosts:
+    - host: dev.timeguild.local
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: "*.dev.timeguild.local"
+      paths:
+        - path: /
+          pathType: Prefix
+
+# Development resource footprints
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi

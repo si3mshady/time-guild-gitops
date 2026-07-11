@@ -1,0 +1,45 @@
+replicaCount: 3
+
+# Disable Stripe simulation sandbox mode for live transactions in production
+config:
+  NEXT_PUBLIC_STRIPE_TEST_MODE: "false"
+
+ingress:
+  className: "nginx" # Use production Nginx controller class instead of Traefik
+  hosts:
+    - host: timeguild.com
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: "*.timeguild.com"
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: timeguild-prod-tls
+      hosts:
+        - timeguild.com
+        - "*.timeguild.com"
+
+# Higher resource thresholds for production scale
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+
+persistence:
+  storageClass: "gp3" # Use AWS gp3 or equivalent cloud fast storage
+  size: 5Gi
+
+# Production secrets must be injected at deploy time via environment variables
+# or decoupled secrets managers (e.g. Vault/SealedSecrets). 
+# We nullify default values here to enforce security.
+secrets:
+  JWT_SECRET: ""
+  STRIPE_SECRET_KEY: ""
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ""
+  SUPABASE_PUBLISHABLE_KEY: ""
+  DEEPSEEK_API_KEY: ""

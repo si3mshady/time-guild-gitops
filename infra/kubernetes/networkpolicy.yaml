@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: timeguild-netpolicy
+  namespace: timeguild-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: timeguild
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow ingress on port 3000 from any pods, or restrict to ingress controller namespace
+    - ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    # Allow egress to CoreDNS for DNS resolution
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow egress to external APIs (Stripe, Twilio, Supabase)
+    - to:
+        # Allow internet egress (non-cluster private IPs)
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16

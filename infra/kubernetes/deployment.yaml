@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timeguild-app
+  namespace: timeguild-prod
+  labels:
+    app: timeguild
+    component: server
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: timeguild
+      component: server
+  template:
+    metadata:
+      labels:
+        app: timeguild
+        component: server
+    spec:
+      serviceAccountName: timeguild-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+        - name: nextjs
+          image: ghcr.io/si3mshady/time-guild:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false # Next.js runtime needs write access to .next/cache
+            runAsNonRoot: true
+            runAsUser: 1001
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          envFrom:
+            - configMapRef:
+                name: timeguild-config
+            - secretRef:
+                name: timeguild-secrets
+          volumeMounts:
+            # Mount the SQLite database file as a single persistent file
+            - name: db-storage
+              mountPath: /app/time_worth.db
+              subPath: time_worth.db
+          # Startup probe allows extra time for NextJS to compile/bootstrap
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 15
+          # Liveness probe monitors if app crashed/deadlocked
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # Readiness probe ensures SQL and routing is ready before sending traffic
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: timeguild-db-pvc

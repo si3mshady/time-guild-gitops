@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: timeguild-service
+  namespace: timeguild-prod
+  labels:
+    app: timeguild
+    component: server
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    app: timeguild
+    component: server

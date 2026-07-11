@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: timeguild-config
+  namespace: timeguild-prod
+data:
+  PORT: "3000"
+  HOSTNAME: "0.0.0.0"
+  NEXT_PUBLIC_STRIPE_TEST_MODE: "true"
+  SUPABASE_PROJECT_ID: "aisfkmcsqususpgaxmsh"
+  SUPABASE_URL: "https://aisfkmcsqususpgaxmsh.supabase.co"

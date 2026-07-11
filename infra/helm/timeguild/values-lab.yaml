@@ -1,0 +1,21 @@
+replicaCount: 2
+
+ingress:
+  hosts:
+    - host: timeguild.lab
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: "*.timeguild.lab"
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: timeguild-tls-secret
+      hosts:
+        - timeguild.lab
+        - "*.timeguild.lab"
+
+persistence:
+  storageClass: "local-path"
+  size: 2Gi

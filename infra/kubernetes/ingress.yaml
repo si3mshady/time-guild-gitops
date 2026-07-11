@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: timeguild-ingress
+  namespace: timeguild-prod
+  annotations:
+    # Traefik (k3s default) and Nginx compatibility annotations
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+    # Main domain routing
+    - host: "timeguild.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: timeguild-service
+                port:
+                  number: 80
+    # Wildcard tenant subdomains routing
+    - host: "*.timeguild.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: timeguild-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - "timeguild.local"
+        - "*.timeguild.local"
+      secretName: timeguild-tls-secret

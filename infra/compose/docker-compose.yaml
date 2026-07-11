@@ -1,0 +1,163 @@
+services:
+  # Next.js / Bun Core Marketplace Application
+  app:
+    build:
+      context: ../../
+      dockerfile: infra/docker/Dockerfile.dev
+    container_name: timeguild-app-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../:/app
+      - /app/node_modules
+      - /app/.next
+      # Persist SQLite file inside a separate directory so it doesn't get wiped or conflict
+      - sqlite-data:/app/data
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      - DB_PATH=/app/data/time_worth.db
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/time_guild?schema=public
+      - JWT_SECRET=timeworth-super-secret-key-321
+      - NEXT_PUBLIC_STRIPE_TEST_MODE=true
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test_placeholder}
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-pk_test_placeholder}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-sk_deepseek_placeholder}
+      # OpenTelemetry configuration
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+      jaeger:
+        condition: service_started
+    networks:
+      - timeguild-net
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # Redis Cache & Background Queue Broker
+  redis:
+    image: redis:7.2-alpine
+    container_name: timeguild-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - timeguild-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # PostgreSQL Database (For Postgres migration testing)
+  db:
+    image: postgres:16-alpine
+    container_name: timeguild-postgres-dev
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=time_guild
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - timeguild-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d time_guild"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Prometheus Scraper & Time Series Database
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: timeguild-prometheus-dev
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    depends_on:
+      - app
+    networks:
+      - timeguild-net
+
+  # Grafana Dashboard Provisioner and Viewer
+  grafana:
+    image: grafana/grafana:10.0.3
+    container_name: timeguild-grafana-dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - timeguild-net
+
+  # Loki Log Aggregator
+  loki:
+    image: grafana/loki:2.9.1
+    container_name: timeguild-loki-dev
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - timeguild-net
+
+  # Promtail Log Agent (Collects and pushes docker stdout/stderr container logs to Loki)
+  promtail:
+    image: grafana/promtail:2.9.1
+    container_name: timeguild-promtail-dev
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - timeguild-net
+
+  # Jaeger Distributed Tracing Collector & UI
+  jaeger:
+    image: jaegertracing/all-in-one:1.50
+    container_name: timeguild-jaeger-dev
+    ports:
+      - "16686:16686"  # UI
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - timeguild-net
+
+networks:
+  timeguild-net:
+    driver: bridge
+
+volumes:
+  sqlite-data:
+  redis-data:
+  postgres-data:
+  prometheus-data:
