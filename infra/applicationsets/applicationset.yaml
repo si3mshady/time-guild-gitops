@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: timeguild-environments
+  name: timeguild-auto-environments
   namespace: argocd
 spec:
   generators:
@@ -9,13 +9,8 @@ spec:
         elements:
           - env: dev
             valuesFile: values-dev.yaml
-            syncPolicy: automated
           - env: staging
             valuesFile: values-lab.yaml
-            syncPolicy: automated
-          - env: prod
-            valuesFile: values-prod.yaml
-            syncPolicy: manual
   template:
     metadata:
       name: 'timeguild-{{env}}'
@@ -39,13 +34,45 @@ spec:
           jsonPointers:
             - /data
       syncPolicy:
-        # Evaluate sync policy dynamically based on list element configurations
-        {{- if eq "{{syncPolicy}}" "automated" }}
         automated:
           prune: true
           selfHeal: true
-        {{- else }}
-        automated: {}
-        {{- end }}
+        syncOptions:
+          - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: timeguild-manual-environments
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: prod
+            valuesFile: values-prod.yaml
+  template:
+    metadata:
+      name: 'timeguild-{{env}}'
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/si3mshady/time-guild-gitops.git'
+        targetRevision: HEAD
+        path: infra/helm/timeguild
+        helm:
+          valueFiles:
+            - values.yaml
+            - '{{valuesFile}}'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: 'timeguild-{{env}}'
+      ignoreDifferences:
+        - group: ""
+          kind: Secret
+          name: 'timeguild-{{env}}-secrets'
+          jsonPointers:
+            - /data
+      syncPolicy:
         syncOptions:
           - CreateNamespace=true
