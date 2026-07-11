@@ -18,6 +18,12 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: timeguild-prod
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: timeguild-prod-secrets
+      jsonPointers:
+        - /data
   syncPolicy:
     # Disable automated sync in production to require manual approval of git commits
     automated:

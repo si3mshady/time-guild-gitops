@@ -19,6 +19,12 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: timeguild-dev
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: timeguild-dev-secrets
+      jsonPointers:
+        - /data
   syncPolicy:
     automated:
       prune: true

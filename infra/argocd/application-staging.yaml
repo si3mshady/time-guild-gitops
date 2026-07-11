@@ -18,6 +18,12 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: timeguild-staging
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: timeguild-staging-secrets
+      jsonPointers:
+        - /data
   syncPolicy:
     automated:
       prune: true
