@@ -17,7 +17,16 @@ spec:
   ingress:
     - ports:
         - protocol: TCP
-          port: 3000
+          {{/*
+          MENTORING NOTE (NetworkPolicy Ingress Block):
+          Why does the NetworkPolicy port use `.Values.service.port` instead of hardcoded 3000?
+          Our application now listens on the service port (80) inside the container. 
+          If the NetworkPolicy is hardcoded to allow ingress traffic only to port 3000, 
+          it will block the Ingress Controller (Traefik) from sending traffic to the pod's port 80.
+          This block results in a "502 Bad Gateway" error at the Ingress edge.
+          Aligning the allowed ingress port with the service port resolves this block.
+          */}}
+          port: {{ .Values.service.port }}
   egress:
     - to:
         - namespaceSelector: {}
