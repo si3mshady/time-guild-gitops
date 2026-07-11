@@ -50,7 +50,9 @@ spec:
           volumeMounts:
             - name: db-storage
               mountPath: {{ .Values.persistence.mountPath }}
+              {{- if .Values.persistence.subPath }}
               subPath: {{ .Values.persistence.subPath }}
+              {{- end }}
           {{- end }}
           startupProbe:
             httpGet:

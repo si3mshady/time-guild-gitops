@@ -12,3 +12,4 @@ data:
   NEXT_PUBLIC_STRIPE_TEST_MODE: {{ .Values.config.NEXT_PUBLIC_STRIPE_TEST_MODE | quote }}
   SUPABASE_PROJECT_ID: {{ .Values.config.SUPABASE_PROJECT_ID | quote }}
   SUPABASE_URL: {{ .Values.config.SUPABASE_URL | quote }}
+  DB_PATH: {{ .Values.config.DB_PATH | quote }}

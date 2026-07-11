@@ -68,8 +68,8 @@ persistence:
   storageClass: "local-path"
   accessMode: ReadWriteOnce
   size: 1Gi
-  mountPath: /app/time_worth.db
-  subPath: time_worth.db
+  mountPath: /app/data
+  subPath: ""
 
 networkPolicy:
   enabled: true
@@ -79,6 +79,7 @@ config:
   NEXT_PUBLIC_STRIPE_TEST_MODE: "true"
   SUPABASE_PROJECT_ID: "aisfkmcsqususpgaxmsh"
   SUPABASE_URL: "https://aisfkmcsqususpgaxmsh.supabase.co"
+  DB_PATH: "/app/data/time_worth.db"
 
 # Secret Environment Variables (Sensitive)
 # Values below are default lab placeholders, override in environments
