@@ -34,10 +34,82 @@ ArgoCD operates on the **declarative GitOps model**. Git is the single source of
 
 ### The ApplicationSet Pattern (Dynamic Generation)
 Instead of hardcoding and maintaining static, manual Application files for every namespace (the "App of Apps" pattern), we use the **ApplicationSet controller** to dynamically generate and template environment deployments.
-*   **The ApplicationSets** ([applicationset.yaml](file:///home/si3mshady/time-guild-gitops/infra/applicationsets/applicationset.yaml)) define generators that scan lists of environments and output corresponding Application specs.
-*   We split the setup into two ApplicationSets:
-    1.  `timeguild-auto-environments`: Generates `timeguild-dev` and `timeguild-staging` with automated pruning and self-healing.
-    2.  `timeguild-manual-environments`: Generates `timeguild-prod` with manual sync policy for controlled staging-to-production promotions.
+
+#### 1. How Git and Helm Combine in our Project
+The ApplicationSet acts as a bridge between your **Git repository** and your **Helm chart** to manage your three environments:
+
+*   **Git-Based Control**: The ApplicationSet controller in the cluster watches the `/infra/applicationsets/` path of your `time-guild-gitops` Git repository. When it reads `applicationset.yaml`, it automatically creates three individual environment applications in your cluster: `timeguild-dev`, `timeguild-staging`, and `timeguild-prod`.
+*   **Helm-Based Rendering**: For each of these three applications, the ApplicationSet directs Argo CD to compile the Helm chart located at `/infra/helm/timeguild` using the specific values files (e.g. merging `values.yaml` + `values-dev.yaml`). Helm then generates the final raw manifests (Deployment, Service, PVC, NetworkPolicy) and deploys them to their respective namespaces (`timeguild-dev`, `timeguild-staging`, `timeguild-prod`).
+
+#### 2. Line-by-Line Breakdown of our Actual ApplicationSet Manifest
+Here is the exact code from your `applicationset.yaml` and how it maps directly to your cluster resource names and namespaces:
+
+*   **The Environment Generator**:
+    ```yaml
+    spec:
+      generators:
+        - list:
+            elements:
+              - env: dev
+                valuesFile: values-dev.yaml
+              - env: staging
+                valuesFile: values-lab.yaml
+    ```
+    *What this does*: It tells Argo CD to loop twice. Loop 1 binds `{{env}}` to `dev` and `{{valuesFile}}` to `values-dev.yaml`. Loop 2 binds `{{env}}` to `staging` and `{{valuesFile}}` to `values-lab.yaml`.
+
+*   **Dynamic Application Naming**:
+    ```yaml
+      template:
+        metadata:
+          name: 'timeguild-{{env}}'
+    ```
+    *What this does*: Automatically names the Application resources in your cluster: `Application: timeguild-dev` and `Application: timeguild-staging`.
+
+*   **Helm Source Configuration**:
+    ```yaml
+        spec:
+          source:
+            repoURL: 'https://github.com/si3mshady/time-guild-gitops.git'
+            targetRevision: HEAD
+            path: infra/helm/timeguild
+            helm:
+              valueFiles:
+                - values.yaml
+                - '{{valuesFile}}'
+    ```
+    *What this does*: Instructs Argo CD to pull the Helm chart files directly from your GitOps repo at `infra/helm/timeguild`. For the `dev` application, it runs Helm merging the global `values.yaml` and `values-dev.yaml` to configure development limits.
+
+*   **Target Cluster Namespaces**:
+    ```yaml
+          destination:
+            server: 'https://kubernetes.default.svc'
+            namespace: 'timeguild-{{env}}'
+    ```
+    *What this does*: Deploys all Helm templates to isolated namespaces in your K3s cluster (`timeguild-dev` and `timeguild-staging`).
+
+*   **Security & Stripe Key Protection**:
+    ```yaml
+          ignoreDifferences:
+            - group: ""
+              kind: Secret
+              name: 'timeguild-{{env}}-secrets'
+              jsonPointers:
+                - /data
+    ```
+    *What this does*: This is the configuration that protects your Stripe credentials. By adding `ignoreDifferences` on `/data` for `timeguild-{{env}}-secrets`, we instruct Argo CD to ignore the drift. The application stays **Synced** and healthy, your real keys remain securely patched on the cluster, and no keys are ever pushed to GitHub.
+
+*   **Automated Deployment Policy**:
+    ```yaml
+          syncPolicy:
+            automated:
+              prune: true
+              selfHeal: true
+            syncOptions:
+              - CreateNamespace=true
+    ```
+    *`prune: true`*: If we delete a template (like a route) from Git, Argo CD automatically deletes it from the cluster.
+    *`selfHeal: true`*: If someone manually modifies the Deployment, Service, or NetworkPolicy in the cluster (e.g. changing the container port back to 3000), Argo CD will automatically revert it back to the Git source of truth (port 80).
+    *`CreateNamespace=true`*: Automatically runs `kubectl create namespace` if it doesn't exist yet, saving you from manual setup.
 
 ---
 
