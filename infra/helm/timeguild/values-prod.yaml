@@ -31,7 +31,7 @@ resources:
     memory: 1024Mi
 
 persistence:
-  storageClass: "gp3" # Use AWS gp3 or equivalent cloud fast storage
+  storageClass: "local-path" # Use local-path storage class
   size: 5Gi
 
 # Production secrets must be injected at deploy time via environment variables
