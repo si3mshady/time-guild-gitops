@@ -20,3 +20,6 @@ persistence:
 
 podSecurityContext:
   runAsNonRoot: false
+
+networkPolicy:
+  enabled: false
