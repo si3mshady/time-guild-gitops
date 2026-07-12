@@ -17,3 +17,6 @@ ingress:
 persistence:
   type: hostPath
   hostPath: "/var/lib/timeguild/data-lab"
+
+podSecurityContext:
+  runAsNonRoot: false

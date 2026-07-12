@@ -29,3 +29,6 @@ resources:
 persistence:
   type: hostPath
   hostPath: "/var/lib/timeguild/data-dev"
+
+podSecurityContext:
+  runAsNonRoot: false
