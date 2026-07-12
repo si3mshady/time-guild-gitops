@@ -12,7 +12,7 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  tls: []
+  tls: null
 
 persistence:
   storageClass: "local-path"

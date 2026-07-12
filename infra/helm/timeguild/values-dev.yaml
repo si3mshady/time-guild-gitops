@@ -15,7 +15,7 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  tls: []
+  tls: null
 
 # Development resource footprints
 resources:
