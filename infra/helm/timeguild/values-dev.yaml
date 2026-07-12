@@ -25,3 +25,7 @@ resources:
   limits:
     cpu: 200m
     memory: 256Mi
+
+persistence:
+  type: hostPath
+  hostPath: "/var/lib/timeguild/data-dev"

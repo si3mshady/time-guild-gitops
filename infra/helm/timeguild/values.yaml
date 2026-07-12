@@ -65,6 +65,8 @@ autoscaling:
 
 persistence:
   enabled: true
+  type: "pvc"
+  hostPath: "/var/lib/timeguild/data"
   storageClass: "local-path"
   accessMode: ReadWriteOnce
   size: 1Gi

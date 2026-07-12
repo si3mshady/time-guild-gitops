@@ -103,6 +103,12 @@ spec:
       {{- if .Values.persistence.enabled }}
       volumes:
         - name: db-storage
+          {{- if eq .Values.persistence.type "hostPath" }}
+          hostPath:
+            path: {{ .Values.persistence.hostPath | quote }}
+            type: DirectoryOrCreate
+          {{- else }}
           persistentVolumeClaim:
             claimName: {{ include "timeguild.fullname" . }}-db-pvc
+          {{- end }}
       {{- end }}

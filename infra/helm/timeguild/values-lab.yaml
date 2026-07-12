@@ -15,5 +15,5 @@ ingress:
   tls: null
 
 persistence:
-  storageClass: "local-path"
-  size: 2Gi
+  type: hostPath
+  hostPath: "/var/lib/timeguild/data-lab"
