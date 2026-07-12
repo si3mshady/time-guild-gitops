@@ -7,11 +7,11 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: null
   hosts:
-    - host: dev.timeguild.local
+    - host: timeguild.xyz
       paths:
         - path: /
           pathType: Prefix
-    - host: "*.dev.timeguild.local"
+    - host: "*.timeguild.xyz"
       paths:
         - path: /
           pathType: Prefix
