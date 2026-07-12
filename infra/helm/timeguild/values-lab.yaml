@@ -1,6 +1,8 @@
 replicaCount: 2
 
 ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: null
   hosts:
     - host: timeguild.lab
       paths:
@@ -11,8 +13,7 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: timeguild-tls-secret
-      hosts:
+    - hosts:
         - timeguild.lab
         - "*.timeguild.lab"
 
