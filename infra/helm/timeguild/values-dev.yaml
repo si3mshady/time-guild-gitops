@@ -15,10 +15,7 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  tls:
-    - hosts:
-        - dev.timeguild.local
-        - "*.dev.timeguild.local"
+  tls: []
 
 # Development resource footprints
 resources:

@@ -12,10 +12,7 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  tls:
-    - hosts:
-        - timeguild.lab
-        - "*.timeguild.lab"
+  tls: []
 
 persistence:
   storageClass: "local-path"
