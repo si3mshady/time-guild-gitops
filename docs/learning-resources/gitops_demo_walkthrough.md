@@ -20,18 +20,11 @@ This walkthrough guide outlines how to demonstrate the GitOps flow in action for
 ## 2. Step-by-Step Demo Execution
 
 ### Step A: Make the Prominent Change (Visual Flag)
-Open [src/app/page.tsx](file:///home/si3mshady/time-guild/src/app/page.tsx) and find the badge at line 30-32:
-```tsx
-            <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-              <span className="size-1.5 rounded-full bg-emerald-500" /> Now in private beta
-            </div>
+You do not need to open a code editor. Simply run this copy-and-paste command to change the hero banner automatically using our pre-written developer script:
+```bash
+node infra/scripts/gitops-demo-forward.js
 ```
-Modify it to a pulsing red **GitOps Live Sync** banner:
-```tsx
-            <div className="inline-flex items-center gap-2 rounded-full border border-rose-500/50 bg-rose-500/10 px-3 py-1 text-xs text-rose-400 backdrop-blur">
-              <span className="size-1.5 rounded-full bg-rose-500 animate-pulse" /> GitOps Live Sync Demo
-            </div>
-```
+*(Alternatively, you can manually open [src/app/page.tsx](file:///home/si3mshady/time-guild/src/app/page.tsx) and change the badge to the pulsing red rose style).*
 
 ---
 
@@ -62,9 +55,12 @@ Go back to your browser tab (`http://timeguild.xyz`) and hit refresh. The badge 
 ---
 
 ### Step E: Revert Back to Original State
-To restore your original layout, simply run:
+To restore your original layout, you can simply run our restore script and push the revert commit:
 ```bash
-git revert HEAD --no-edit
+node infra/scripts/gitops-demo-backward.js
+git add src/app/page.tsx
+git commit -m "chore: restore original layout"
 git push origin main
 ```
-*   **Narration**: *"Reverting this update is as simple as reverting our Git history. I push a revert commit, and the entire reconciliation loop repeats itself, returning the cluster safely to our desired production state."*
+*(Alternatively, you can run `git revert HEAD --no-edit && git push origin main` if you made the forward change using Git commits only).*
+*   **Narration**: *"Reverting this update is as simple as running our restore script and pushing the commit, or performing a git revert. The reconciliation loop repeats itself, returning the cluster safely to our desired production state."*
