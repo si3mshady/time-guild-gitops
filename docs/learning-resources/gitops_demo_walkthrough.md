@@ -22,7 +22,7 @@ This walkthrough guide outlines how to demonstrate the GitOps flow in action for
 ### Step A: Make the Prominent Change (Visual Flag)
 You do not need to open a code editor. Simply run this copy-and-paste command to change the hero banner automatically using our pre-written developer script:
 ```bash
-node infra/scripts/gitops-demo-forward.js
+node infra/scripts/gitops-demo-forward.cjs
 ```
 *(Alternatively, you can manually open [src/app/page.tsx](file:///home/si3mshady/time-guild/src/app/page.tsx) and change the badge to the pulsing red rose style).*
 
@@ -57,7 +57,7 @@ Go back to your browser tab (`http://timeguild.xyz`) and hit refresh. The badge 
 ### Step E: Revert Back to Original State
 To restore your original layout, you can simply run our restore script and push the revert commit:
 ```bash
-node infra/scripts/gitops-demo-backward.js
+node infra/scripts/gitops-demo-backward.cjs
 git add src/app/page.tsx
 git commit -m "chore: restore original layout"
 git push origin main
