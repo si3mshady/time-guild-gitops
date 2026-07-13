@@ -85,7 +85,38 @@ To make all connections secure:
 1.  **ClusterIssuer**: Connects K3s to Let's Encrypt using the ACME DNS-01 challenge.
 2.  **DNS-01 Challenge**: cert-manager verifies ownership of `timeguild.xyz` by writing a temporary TXT DNS record (via the Cloudflare or DNS provider API).
 3.  **Certificate Secret**: Upon validation, Let's Encrypt signs a wildcard SSL certificate. cert-manager saves this certificate as `wildcard-tls-secret` inside the `kube-system` namespace.
-4.  **Traefik Default Store**: A Kubernetes namespace boundary normally prevents `tenant-elliott` from mounting a secret stored in `kube-system`. We solve this by adding a `TLSStore` resource to Traefik. This registers `wildcard-tls-secret` as the global default fallback certificate. If an ingress does not specify a TLS secret, Traefik serves the wildcard certificate automatically.
+4.  **Traefik Default Store**: A Kubernetes namespace boundary normally prevents `tenant-elliott` from mounting a secret stored in `kube-system`. We solve this by adding a `TLSStore` resource to Traefik. This registers `wildcard-tls-secret` as the global default fallback certificate.
+
+### C. Explicit Ingress TLS vs. Traefik Default TLS Store (Macro & Micro)
+
+#### 1. The Macro Layer (The Ingress Spec Configuration)
+*   **The Problem with `tls: null`**: 
+    When Helm values define `tls: null`, the generated Ingress resource in Kubernetes does **not** contain a `spec.tls` block. Technically, at the Kubernetes resource level, the Ingress is defined as HTTP-only.
+*   **Why HTTPS Still Resolves**: 
+    Even without `spec.tls`, Traefik intercepts incoming HTTPS requests (port 443) because its global entrypoints are configured to listen for TLS. When a request arrives, Traefik inspects its default certificate store, finds our wildcard certificate, and serves it as a fallback. 
+*   **Why Explicit TLS is Better**: 
+    Setting `tls: null` is bad practice because it masks the true networking requirements of the Ingress. Tools like `kubectl describe ingress` or ArgoCD will show the resource as insecure.
+
+#### 2. The Micro Layer (The Decoupled TLS Mapping)
+To achieve explicit TLS configuration without duplicating certificates across namespaces, we configure the Ingress spec with a `tls` block, but **omit** the `secretName`:
+
+```yaml
+spec:
+  tls:
+    - hosts:
+        - timeguild.xyz
+        - "*.timeguild.xyz"
+  rules:
+    - host: "timeguild.xyz"
+      http: ...
+```
+
+*   **Traefik TLS Matcher**: 
+    When Traefik reads this Ingress resource, the presence of `spec.tls` instructs it to configure a TLS-terminated route specifically for `timeguild.xyz` and `*.timeguild.xyz`.
+*   **Default TLS Store Fallback**: 
+    Because `secretName` is omitted, Traefik does not attempt to look up a local secret in the namespace. Instead, it falls back to the Traefik `default` `TLSStore` (located in `kube-system`), serving the pre-authenticated wildcard SSL certificate.
+*   **Namespace Security Bypass**: 
+    This allows us to enforce strict TLS configuration across all environments (`dev`, `lab`, `prod`) while ensuring that private keys are never exposed or copied into user namespaces.
 
 ---
 

@@ -78,3 +78,19 @@ To secure our live wildcard subdomains over HTTPS:
       - "timeguild.xyz"
     ```
 2.  Applied to K3s. cert-manager verified ownership and successfully updated the `wildcard-tls-secret` in `kube-system`. Traefik immediately loaded the updated certificate to handle secure TLS handshakes for `*.timeguild.xyz` subdomains.
+
+### C. Explicit Ingress TLS vs. Traefik Default TLS Store
+*   **The Ingress Spec Difference**:
+    When an Ingress is created with `tls: null` in Helm, the resulting Kubernetes manifest lacks the `spec.tls` block entirely. 
+*   **How HTTPS Still Resolved (Implicitly)**:
+    Even without `spec.tls` on the Ingress, Traefik intercepted HTTPS requests (port 443) and decrypted them using the default wildcard cert because it was loaded into the default `TLSStore` in `kube-system`.
+*   **The Explicit Fix**:
+    We modified our environment values (`values-dev.yaml`, `values-lab.yaml`) to explicitly define `spec.tls` but **omitted** the `secretName`:
+    ```yaml
+    ingress:
+      tls:
+        - hosts:
+            - timeguild.xyz
+            - "*.timeguild.xyz"
+    ```
+    This signals to Kubernetes that the ingress endpoints require TLS, while telling Traefik to safely fall back to the pre-authenticated default wildcard certificate in `kube-system` rather than expecting a duplicated secret in the tenant namespace.
