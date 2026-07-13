@@ -70,7 +70,7 @@ spec:
             - configMapRef:
                 name: {{ include "timeguild.fullname" . }}-config
             - secretRef:
-                name: {{ include "timeguild.fullname" . }}-secrets
+                name: {{ include "timeguild.fullname" . }}-env-secrets
           {{- if .Values.persistence.enabled }}
           {{/*
           MENTORING NOTE (SQLite subPath Mount Issue):
