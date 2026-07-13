@@ -15,7 +15,10 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  tls: null
+  tls:
+    - hosts:
+        - timeguild.xyz
+        - "*.timeguild.xyz"
 
 # Development resource footprints
 resources:

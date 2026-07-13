@@ -7,19 +7,19 @@ config:
 ingress:
   className: "nginx" # Use production Nginx controller class instead of Traefik
   hosts:
-    - host: timeguild.com
+    - host: prod.timeguild.xyz
       paths:
         - path: /
           pathType: Prefix
-    - host: "*.timeguild.com"
+    - host: "*.prod.timeguild.xyz"
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: timeguild-prod-tls
       hosts:
-        - timeguild.com
-        - "*.timeguild.com"
+        - prod.timeguild.xyz
+        - "*.prod.timeguild.xyz"
 
 # Higher resource thresholds for production scale
 resources:
