@@ -31,3 +31,5 @@ spec:
     - "timeguild.lab"
     - "*.timeguild.com"
     - "timeguild.com"
+    - "*.timeguild.xyz"
+    - "timeguild.xyz"
