@@ -19,8 +19,8 @@ Your current Docker Compose setup is **highly mature for local development**:
 3.  **DNS & Routing**: Replace port mappings (`3000:3000`) with a static **AWS Elastic IP** and a **Namecheap wildcard A-record** routing to a Kubernetes **Ingress controller (Traefik)**.
 4.  **Deployment Controller**: Replace Docker Compose commands with **ArgoCD (GitOps)** tracking a packaged **Helm Chart**.
 5.  **SSL/TLS**: Replace HTTP with **wildcard Let's Encrypt certificates** managed by `cert-manager` using Traefik's Default TLS Store.
-6.  **Dynamic Namespace Provisioning**: Implement code inside Next.js to talk to the K3s API server and spin up namespaces/pods dynamically.
-7.  **Distributed Observability**: Re-configure Promtail/Prometheus to dynamically discover and label log and metric streams as new namespaces are spawned.
+6.  **Dynamic Namespace Provisioning (Completed)**: Implement code inside Next.js to talk to the K3s API server and spin up namespaces/pods dynamically.
+7.  **Distributed Observability (Next Up)**: Re-configure Promtail/Prometheus to dynamically discover and label log and metric streams as new namespaces are spawned.
 
 ---
 
@@ -42,10 +42,10 @@ Your current Docker Compose setup is **highly mature for local development**:
                [ Day 5: Wildcard SSL & TLS Store ]
                            │
                            ▼
-               [ Day 6: Dynamic API Provisioner ]
+               [ Day 6: Dynamic API Provisioner (Completed) ]
                            │
                            ▼
-               [ Day 7: Observability Autodiscovery ]
+               [ Day 7: Observability Autodiscovery (Next Up) ]
 ```
 
 ---
@@ -120,13 +120,13 @@ Your current Docker Compose setup is **highly mature for local development**:
 
 ---
 
-## Day 6 — Dynamic Namespace Provisioner (REST API integration)
+## Day 6 — Dynamic Namespace Provisioner (REST API integration - Completed)
 *   **Goal**: Enable your Next.js application to dynamically spawn namespace clusters for registered users.
-*   **Tasks**:
-    1.  Create a Kubernetes `ClusterRole` and `ClusterRoleBinding` granting your main Next.js Pod's ServiceAccount permissions to create and delete namespaces, deployments, services, and ingresses.
-    2.  Write a Kubernetes REST API client helper in your Next.js codebase (using standard `fetch` with the pod's mounted service account token).
-    3.  Update the user registration endpoint: when a signup succeeds, Next.js calls the API to provision the `tenant-<username>` namespace and manifests in under 3 seconds.
-    4.  Deploy and verify: Sign up a user and verify that `username.yourdomain.com` immediately loads their isolated container containerized page.
+*   **Tasks Completed**:
+    1.  Created a Kubernetes `ClusterRole` and `ClusterRoleBinding` granting your main Next.js Pod's ServiceAccount permissions to create and delete namespaces, deployments, services, and ingresses.
+    2.  Wrote a Kubernetes REST API client helper in your Next.js codebase (using standard `fetch` with the pod's mounted service account token in `src/lib/k8s.ts`).
+    3.  Updated the user registration endpoint: when a signup succeeds, Next.js calls the API to provision the `tenant-<username>` namespace and manifests in under 3 seconds.
+    4.  Deployed and verified: Sign up a user and verify that `username.yourdomain.com` immediately loads their isolated container containerized page.
 *   **Study & Articulation Resources**:
     *   *Kubernetes REST API reference*: [kubernetes.io/docs/reference/using-api/api-concepts/](https://kubernetes.io/docs/reference/using-api/api-concepts/)
     *   *Understanding Role-Based Access Control (RBAC)*: [kubernetes.io/docs/reference/access-authn-authz/rbac/](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
@@ -134,12 +134,12 @@ Your current Docker Compose setup is **highly mature for local development**:
 
 ---
 
-## Day 7 — Observability Auto-Discovery (Prometheus & Loki)
+## Day 7 — Observability Auto-Discovery (Prometheus & Loki - Next Up)
 *   **Goal**: Monitor log and metrics streams automatically as new tenant namespaces appear.
 *   **Tasks**:
     1.  Deploy **Prometheus** and **Loki** to your K3s cluster.
     2.  Configure **Promtail** daemonsets with Kubernetes service discovery rules: when a pod in a `tenant-<username>` namespace is created, Promtail must scrape its logs and attach the `tenant` label automatically.
-    3.  Configure Prometheus **ServiceMonitors** to scrape performance metrics per namespace.
+    3.  Configure Prometheus **ServiceMonitors** to scrape performance metrics per namespace using `namespaceSelector: any: true`.
     4.  Design a Grafana Dashboard template: Add a `tenant` dropdown menu so you can view isolated performance graphs, response rates, and Loki log streams for any specific user.
 *   **Study & Articulation Resources**:
     *   *Promtail Kubernetes Discovery Configuration*: [grafana.com/docs/loki/latest/send-data/promtail/configuration/#kubernetes_sd_config](https://grafana.com/docs/loki/latest/send-data/promtail/configuration/#kubernetes_sd_config)

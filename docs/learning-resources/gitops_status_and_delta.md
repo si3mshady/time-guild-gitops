@@ -6,11 +6,12 @@ This document evaluates the current maturity of the Time Guild project's contain
 
 ## 1. Current Progress Status
 
-The application is highly mature and optimized at the codebase layer:
+The application is highly mature and optimized at the codebase and orchestration layer:
 *   **Pure Next.js Unification**: Unused TanStack Start/Router configuration files (`vite.config.ts`, `src/routes/`, `src/start.ts`, etc.) have been deleted. Overlapping dependencies have been cleaned in `package.json`. The application compiles and builds in production mode with zero errors.
 *   **Production Container Config**: A multi-stage [Dockerfile](file:///home/si3mshady/time-guild/Dockerfile) using Bun Alpine is present at the root, optimizing build and run stages for Kubernetes.
 *   **CI/CD Pipeline Ready**: Created the GitHub Actions workflow at [.github/workflows/docker-publish.yml](file:///home/si3mshady/time-guild/.github/workflows/docker-publish.yml) to build and publish the container to Docker Hub on every merge/push to `main`.
 *   **Target Cluster Configured**: K3s (lightweight Kubernetes) is installed on your AWS EC2 instance.
+*   **Dynamic Namespace Auto-Provisioning (Day 6 Complete)**: The application acts as a Kubernetes orchestrator. The K8s API REST helper client has been written in `src/lib/k8s.ts` and integrated with the creator registration endpoint `src/app/api/creators/route.ts` to provision isolated namespaces (`tenant-<username>`), deployments, services, and ingresses in under 3 seconds.
 
 ---
 
@@ -37,13 +38,13 @@ To make the infrastructure fully GitOps-controlled, the following configuration 
 *   **Action**: Delegate your Namecheap domain nameservers to Cloudflare (Free tier) to solve Let's Encrypt DNS-01 ACME verification challenges.
 *   **Action**: Configure cert-manager to generate a wildcard SSL certificate (`*.yourdomain.com`) and configure Traefik's `TLSStore` default certificate to serve it to all tenant namespaces automatically.
 
-### E. Next.js REST API Auto-Provisioning (Day 6)
-*   **Action**: Bind Kubernetes ClusterRole permissions allowing the Next.js ServiceAccount to create resources inside K3s.
-*   **Action**: Write the K8s Client helper inside Next.js (`src/lib/k8s.ts`) to programmatically request the creation of a Namespace (`tenant-<username>`), Deployment, Service, and Ingress route whenever a creator signs up.
+### E. Observability Auto-Discovery (Day 7 - Next Up)
+*   **Action**: Update Promtail and Prometheus Operator configs to auto-discover and label dynamically spawned workspaces (`tenant-(.*)`).
+*   **Action**: Configure ServiceMonitors to scan all namespaces using `namespaceSelector: any: true` to scrape Next.js `/api/metrics` dynamically.
 
 ---
 
 ## 3. Recommended Action Items
 1.  **Commit and Push**: Push all framework cleanups, playbooks, and GitOps roadmaps to GitHub.
-2.  **Add Repo Secrets**: Configure Docker Hub credentials on GitHub to run the image publisher.
+2.  **Apply Day 7 Configs**: Update Promtail scraper configs and `prometheus-servicemonitor.yaml` to enable auto-discovery.
 3.  **Local API Configuration**: Follow the Day 3 guide to extract your EC2 kubeconfig and gain remote control of K3s.
