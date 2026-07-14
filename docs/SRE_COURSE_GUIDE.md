@@ -13,7 +13,8 @@ Welcome! If you are preparing for a technical take-home test or trying to intern
 5. [Principle 4: Financial Transaction Observability (Stripe Escrow & Payouts)](#5-principle-4-financial-transaction-observability-stripe-escrow--payouts)
 6. [Principle 5: Alerting Grouping & Operational Runbooks](#6-principle-5-alerting-grouping--operational-runbooks)
 7. [Cross-Industry Reference: Banks, Power Grids, and AI Platforms](#7-cross-industry-reference-banks-power-grids-and-ai-platforms)
-8. [Summary of What We Built in This Workspace](#8-summary-of-what-we-built-in-this-workspace)
+8. [Local Verification: How to Test Metrics & Logs](#8-local-verification-how-to-test-metrics--logs)
+9. [Summary of What We Built in This Workspace](#9-summary-of-what-we-built-in-this-workspace)
 
 ---
 
@@ -174,7 +175,34 @@ Here is how the exact same SRE principles apply across different high-paying ind
 
 ---
 
-## 8. Summary of What We Built in This Workspace
+## 8. Local Verification: How to Test Metrics & Logs
+
+To check that your SRE monitoring pipeline is functioning correctly, follow these testing procedures:
+
+### 1. Port Forward the Grafana Dashboard
+Open a terminal and establish a secure connection tunnel:
+```bash
+kubectl port-forward -n timeguild-monitoring svc/prometheus-stack-grafana 3000:80
+```
+Open **`http://localhost:3000`** in your browser. Log in with:
+*   **Username:** `admin`
+*   **Password:** `bnfQ7FgNgeOgdjHHe4kICimyHLpMfbM80Ox9PzG1`
+
+Navigate to **Dashboards** -> Select **"Time Guild SRE Monitoring Dashboard"**.
+
+### 2. Generate Trace and Log Events
+1. Open your web browser and navigate to the application: `http://timeguild.xyz`.
+2. Interact with the system: sign in, view a creator's page, start a pre-qualification chat with the AI assistant, or verify a completion PIN code.
+3. Every page action and API click will automatically generate a standard W3C `traceparent` context tracking header.
+
+### 3. Check Real-Time Logs in Grafana
+* In Grafana, select the dropdown filter variable `tenant` at the top of the dashboard.
+* Select your creator tenant username (e.g., `testcreator`).
+* Scroll to the **Loki Log Streams** panel. You will see structured JSON logs appearing in real-time. Notice how the `/api/metrics` noise is filtered out, but critical execution details, billing status, and circuit breaker health updates are captured.
+
+---
+
+## 9. Summary of What We Built in This Workspace
 You now have a production-ready observability and resilience system:
 1. **Dynamic Service Discovery:** Prometheus auto-scrapes metrics across all dynamic tenant namespaces (`tenant-*`) thanks to ServiceMonitors and service labeling in `k8s.ts`.
 2. **End-to-End Tracing:** Frontend requests generate a W3C `traceparent` which traverses the Next.js middleware and logs performance timings back to the browser.
