@@ -85,6 +85,10 @@ The micro view analyzes how web standards, code execution, and browser security 
      }, [user, loading, router]);
      ```
 
+### C. Next.js Client-Side Request Caching & Role Update Lag
+* **Why it happened:** Next.js and web browsers cache `GET` requests (such as `/api/auth/user`) by default to improve navigation performance. When a user signed up, their role was initialized as `"client"`. Clicking "Earn from my time" successfully updated the database role to `"creator"`, but subsequent `refreshUser()` calls used the browser's **cached GET response** showing `"client"`. The UI remained stuck on the role selection screen because it never realized the role had updated.
+* **The Fix:** We disabled caching on the user session query by adding `{ cache: "no-store" }` to the client-side `fetch` options in [auth-provider.tsx](file:///home/si3mshady/time-guild/src/components/auth-provider.tsx) and returning `Cache-Control: no-store, max-age=0, must-revalidate` in [route.ts (user session)](file:///home/si3mshady/time-guild/src/app/api/auth/user/route.ts).
+
 ---
 
 ## 4. Skills Inventory for Troubleshooting
