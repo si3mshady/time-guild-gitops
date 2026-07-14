@@ -92,7 +92,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(timeguild_bookings_total)",
+          "expr": "sum(timeguild_bookings_total{tenant=~\"$tenant\"})",
           "legendFormat": "Bookings",
           "range": true,
           "refId": "A"
@@ -154,7 +154,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(timeguild_booking_revenue_dollars_total)",
+          "expr": "sum(timeguild_booking_revenue_dollars_total{tenant=~\"$tenant\"})",
           "legendFormat": "Revenue",
           "range": true,
           "refId": "A"
@@ -216,7 +216,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "timeguild_stripe_transfers_completed_total",
+          "expr": "sum(timeguild_stripe_transfers_completed_total{tenant=~\"$tenant\"})",
           "legendFormat": "Transfers",
           "range": true,
           "refId": "A"
@@ -357,7 +357,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "timeguild_slots_total",
+          "expr": "timeguild_slots_total{tenant=~\"$tenant\"}",
           "legendFormat": "{{status}} slots",
           "range": true,
           "refId": "A"
@@ -447,7 +447,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "timeguild_http_request_duration_seconds",
+          "expr": "timeguild_http_request_duration_seconds{tenant=~\"$tenant\"}",
           "legendFormat": "HTTP Request Latency (P95)",
           "range": true,
           "refId": "A"
@@ -458,7 +458,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "timeguild_db_query_duration_seconds",
+          "expr": "timeguild_db_query_duration_seconds{tenant=~\"$tenant\"}",
           "legendFormat": "Avg SQL Query Latency",
           "range": true,
           "refId": "B"
@@ -507,7 +507,7 @@
             "uid": "Loki"
           },
           "editorMode": "code",
-          "expr": "{app=~\"timeguild-app-dev.*\"}",
+          "expr": "{tenant=~\"$tenant\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -520,7 +520,30 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "Prometheus"
+        },
+        "definition": "label_values(timeguild_users_total, tenant)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": false,
+        "name": "tenant",
+        "options": [],
+        "query": {
+          "query": "label_values(timeguild_users_total, tenant)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-1h",

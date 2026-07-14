@@ -10,8 +10,9 @@ Welcome! If you are preparing for a technical take-home test or trying to intern
 2. [Principle 1: Distributed Tracing & W3C Trace Context](#2-principle-1-distributed-tracing--w3c-trace-context)
 3. [Principle 2: Low-Cardinality Indexing (Loki/Log Aggregation)](#3-principle-2-low-cardinality-indexing-lokilog-aggregation)
 4. [Principle 3: Defensive Code & Circuit Breakers (Polly/Resilience)](#4-principle-3-defensive-code--circuit-breakers-pollyresilience)
-5. [Principle 4: Alerting Grouping & Operational Runbooks](#5-principle-4-alerting-grouping--operational-runbooks)
-6. [Summary of What We Built in This Workspace](#6-summary-of-what-we-built-in-this-workspace)
+5. [Principle 4: Financial Transaction Observability (Stripe Escrow & Payouts)](#5-principle-4-financial-transaction-observability-stripe-escrow--payouts)
+6. [Principle 5: Alerting Grouping & Operational Runbooks](#6-principle-5-alerting-grouping--operational-runbooks)
+7. [Summary of What We Built in This Workspace](#7-summary-of-what-we-built-in-this-workspace)
 
 ---
 
@@ -96,7 +97,48 @@ When our app calls an external API, we wrap the call inside a resilience pipelin
 
 ---
 
-## 5. Principle 4: Alerting Grouping & Operational Runbooks
+## 5. Principle 4: Financial Transaction Observability (Stripe Escrow & Payouts)
+
+### The Analogy
+Imagine you buy a house. You don't hand a suitcase of cash directly to the seller; you put the money in an **Escrow Account** managed by a trusted bank. The bank keeps a ledger:
+1. **Deposit:** Buyer placed $100 in escrow.
+2. **Verification:** Inspections pass.
+3. **Payout:** Bank takes its 15% platform commission and transfers the remaining 85% to the seller.
+
+If the seller claims they never got paid, you look at the bank ledger to see exactly where the funds went.
+
+### The Technical Explanation
+In Time Guild, we track payment money moving through Stripe (retaining 15% platform fee and transferring 85% creator net share via connected Express account) using a three-tier observability stack:
+
+#### 1. Metric Indicators (Prometheus)
+We increment custom metrics at key stages of the transaction:
+* `timeguild_bookings_total{status="created|confirmed|cancelled|refunded"}`: Counts the number of bookings at each stage.
+* `timeguild_booking_revenue_dollars_total`: Measures the total volume of money flowing into our escrow platform.
+* `timeguild_stripe_transfers_completed_total`: Tracks successful transfers to creators' connected Express accounts, ensuring we can verify payout frequencies.
+
+#### 2. Transaction Audit Logs (Loki)
+When Stripe actions occur, we print structured JSON logs carrying critical metadata. We follow the **Label Split Rule**—keeping high-cardinality keys like Stripe `charge_id`, `transfer_id`, or `refund_id` in the JSON body, while indexing by the `tenant` label:
+```json
+{
+  "timestamp": "2026-07-14T01:30:00Z",
+  "event": "stripe_payout_completed",
+  "tenant": "testcreator",
+  "booking_id": "33865a9c-15e8-4494-89cd-b6006f4dc15d",
+  "stripe_charge_id": "ch_1Tqgz...",
+  "stripe_transfer_id": "tr_1Tqgz...",
+  "net_share_cents": 8500,
+  "commission_rate": 0.15
+}
+```
+
+#### 3. Trace Context Links (OpenTelemetry)
+We wrap the Stripe webhook handler and payout handshakes in trace spans. When a payment intent succeeds:
+* The client's original checkout trace parent is propagated to the Stripe webhook listener route `/api/stripe/webhook`.
+* If a payout fails due to a Stripe API issue, the trace span is tagged with `error=true` and the circuit breaker logs state transitions to help the on-call engineer diagnose whether Stripe's developer platform is experiencing an outage.
+
+---
+
+## 6. Principle 5: Alerting Grouping & Operational Runbooks
 
 ### The Analogy
 If a power plant goes offline, 10,000 household alarms might go off. If the power plant operator receives 10,000 separate alerts, they will be overwhelmed (**alert fatigue**) and won't be able to find the root cause. 
@@ -110,9 +152,9 @@ Instead, the alert system should group those alarms: "Power Grid Zone A is Offli
 
 ---
 
-## 6. Summary of What We Built in This Workspace
+## 7. Summary of What We Built in This Workspace
 You now have a production-ready observability and resilience system:
 1. **Dynamic Service Discovery:** Prometheus auto-scrapes metrics across all dynamic tenant namespaces (`tenant-*`) thanks to ServiceMonitors and service labeling in `k8s.ts`.
 2. **End-to-End Tracing:** Frontend requests generate a W3C `traceparent` which traverses the Next.js middleware and logs performance timings back to the browser.
 3. **API & Payment Resilience:** Stripe payments, refunds, and DeepSeek assistant chats are wrapped inside circuit breakers and backoff retry routines with telemetry tracking.
-4. **Structured SRE Logging:** HTTP requests and circuit breaker states are logged as clean JSON lines, ready for Promtail ingestion and Loki querying without index bloat.
+4. **Structured SRE Logging & Transaction Audit:** HTTP requests, Stripe payouts, and circuit breaker states are logged as clean JSON lines, ready for Promtail ingestion and Loki querying without index bloat.
