@@ -1,4 +1,4 @@
-# SRE Journal & Log - Infrastructure & GitOps Repository
+# SRE Journal & Log - GitOps Repository
 
 ## 1. Discovery Phase & Architecture Inventory
 
@@ -38,3 +38,6 @@
 * **W3C Trace Context Middleware:** Implemented a Next.js middleware in **[middleware.ts](file:///home/si3mshady/time-guild/src/middleware.ts)** that extracts/injects `traceparent` headers, sets `Server-Timing` headers, exposes headers to CORS, and logs requests in structured JSON format (filtering out static assets and prometheus metrics scrapes).
 * **React Fetch Interceptor:** Modified **[providers.tsx](file:///home/si3mshady/time-guild/src/components/providers.tsx)** to inject W3C standard traceparent context headers (`traceparent = 00-traceId-spanId-flags`) for internal requests, implementing 10% client-side trace sampling.
 * **OTel Exporter Protection:** Configured conditional trace exporter inside **[instrumentation.ts](file:///home/si3mshady/time-guild/src/instrumentation.ts)** to only instantiate `OTLPTraceExporter` when `OTEL_EXPORTER_OTLP_ENDPOINT` is present, avoiding StackTrace log pollution in environments where a collector is not running.
+* **Stripe Webhook CLI Forwarding with K3s Traefik Ingress:** Solved Stripe SSL handshake failures. Since the cluster uses private/self-signed certs (untrusted by Stripe), Stripe aborts webhook delivery to HTTPS endpoints. We configured the local Stripe CLI forwarder to relay messages to `http://timeguild.xyz/api/stripe/webhook` (HTTP instead of HTTPS). Traefik doesn't force HTTP-to-HTTPS redirect, letting Stripe CLI bypass SSL verification and successfully deliver the JSON payload to the dev pod over port 80.
+* **Next.js Behind-Proxy Redirect Domain Host Fix:** Fixed a localhost redirect loop after checkout completion. Inside K3s behind Traefik, standard Next.js `new URL(req.url)` calls return the internal service address (`localhost:80` or `127.0.0.1:3000`). We updated `redirect/route.ts` and `checkout/route.ts` to parse `x-forwarded-proto` and `x-forwarded-host` headers to reconstruct the public domain redirect URL, breaking the loop.
+* **Grafana Dashboard Auto-Discovery ConfigMap:** Created and labeled the `timeguild-dashboard` ConfigMap in the `timeguild-monitoring` namespace with the tag `grafana_dashboard="1"`. The Grafana sidecar automatically auto-discovered the ConfigMap, saved the configuration to disk, and successfully loaded the dashboard inside the Grafana UI.

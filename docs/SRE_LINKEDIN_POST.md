@@ -4,7 +4,7 @@
 
 ---
 
-## 1. LinkedIn Post Proposal
+## 1. LinkedIn Post Proposal (Observability Autodiscovery)
 
 ```text
 🚀 How do you monitor a multi-tenant SaaS application that dynamically spins up isolated Kubernetes namespaces for users in real-time?
@@ -25,7 +25,31 @@ Macro SRE is about system-wide scalability and security boundaries. Micro SRE is
 
 ---
 
-## 2. Macro vs. Micro Engineering Analysis
+## 2. LinkedIn Post Proposal (Stripe Webhook SSL & Proxy Host Redirect Focus)
+
+```text
+🚀 Diagnosing the "Silent Loop": Solving Stripe Webhook SSL Handshakes & Next.js Proxy Redirects in Kubernetes
+
+Ever deployed an app behind a proxy/ingress in K8s, completed a payment checkout, and got stuck in an infinite "Awaiting Payment" loop? 
+
+We spent today debugging this exact scenario in a multi-tenant SaaS application, and the root cause came down to two classic network challenges:
+
+1️⃣ The SSL Verification Wall: Stripe webhooks require HTTPS for public domains and strictly verify SSL certificates. Since our development cluster runs private/self-signed certs, Stripe's servers failed the TLS handshake and aborted webhook delivery. No webhooks = booking status stuck in 'awaiting_payment' = loop.
+   👉 Solution: Tunnel securely. We ran a local Stripe CLI forwarder mapping webhooks to our plain HTTP endpoint (http://timeguild.xyz/api/stripe/webhook). Since Traefik accepts plain HTTP traffic on port 80, the CLI bypassed SSL checks and successfully delivered payloads to our dev pod.
+
+2️⃣ The Localhost Redirect Trap: Inside K8s behind Traefik, standard Next.js 'new URL(req.url)' queries resolved to the internal container address (localhost:80), redirecting users to localhost after checkout completed!
+   👉 Solution: Respect headers. We refactored the checkout session and redirect APIs to reconstruct the public origin using proxy-propagated headers: 'x-forwarded-proto' (https) and 'x-forwarded-host' (timeguild.xyz).
+
+3️⃣ Auto-Discovery Dashboards: We packaged our custom Grafana dashboard JSON into a Kubernetes ConfigMap, tagged with 'grafana_dashboard: "1"'. The Grafana sidecar automatically auto-discovered the map, injected it into disk, and populated the UI in real-time.
+
+Telemetry isn't just about pretty graphs—it's the only way to detect why a webhook was silently swallowed or why a redirect URL went rogue. 
+
+#devops #sre #kubernetes #grafana #stripe #webdevelopment #softwareengineering
+```
+
+---
+
+## 3. Macro vs. Micro Engineering Analysis
 
 ### Macro Rationale (The System-Wide Architecture)
 * **Compute Isolation Security:** Running a multi-tenant platform inside a single namespace is a shared-fate security hazard. We isolate each creator inside a dedicated Namespace. If one pod is compromised or OOMs, the blast radius is strictly contained.
