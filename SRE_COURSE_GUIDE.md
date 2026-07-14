@@ -1,7 +1,7 @@
 # SRE Course Guide: End-to-End Observability & System Resilience
 **A Comprehensive Guide for Software Engineers & SREs**
 
-Welcome! If you are preparing for a technical take-home test or trying to internalize how professional, enterprise-grade cloud systems are monitored and kept stable, this guide is designed for you. We will explain complex Site Reliability Engineering (SRE) concepts using everyday analogies that anyone can understand.
+Welcome! If you are preparing for a technical take-home test or trying to internalize how professional, enterprise-grade cloud systems are monitored and kept stable, this guide is designed for you. We will explain complex Site Reliability Engineering (SRE) concepts using everyday analogies that anyone can understand, and map them across multiple industries.
 
 ---
 
@@ -12,7 +12,8 @@ Welcome! If you are preparing for a technical take-home test or trying to intern
 4. [Principle 3: Defensive Code & Circuit Breakers (Polly/Resilience)](#4-principle-3-defensive-code--circuit-breakers-pollyresilience)
 5. [Principle 4: Financial Transaction Observability (Stripe Escrow & Payouts)](#5-principle-4-financial-transaction-observability-stripe-escrow--payouts)
 6. [Principle 5: Alerting Grouping & Operational Runbooks](#6-principle-5-alerting-grouping--operational-runbooks)
-7. [Summary of What We Built in This Workspace](#7-summary-of-what-we-built-in-this-workspace)
+7. [Cross-Industry Reference: Banks, Power Grids, and AI Platforms](#7-cross-industry-reference-banks-power-grids-and-ai-platforms)
+8. [Summary of What We Built in This Workspace](#8-summary-of-what-we-built-in-this-workspace)
 
 ---
 
@@ -152,7 +153,28 @@ Instead, the alert system should group those alarms: "Power Grid Zone A is Offli
 
 ---
 
-## 7. Summary of What We Built in This Workspace
+## 7. Cross-Industry Reference: Banks, Power Grids, and AI Platforms
+
+Here is how the exact same SRE principles apply across different high-paying industries:
+
+### A. Distributed Tracing (Tracking Requests)
+* **Banks:** A customer swipes a credit card at a store. The request starts at the merchant terminal (browser), routes through Visa (API Gateway), checks a fraud detection model (Internal service), and deducts the bank ledger (Database). The W3C `traceparent` travels with the transaction across all these bank systems.
+* **Power Grids:** A smart-meter detects a power surge. The event flows to a substation gateway, through grid routers, to a central load calculator, and adjusts turbine generators. The trace tracks latency at each step to prevent grid instability.
+* **AI Companies:** A user inputs a chat prompt. The request hits the API Gateway, fetches semantic contexts from a Vector Database (RAG), schedules inference on a GPU Cluster, and streams the reply. The trace shows exactly which model stage had high latency.
+
+### B. Low-Cardinality Logging (Index Protection)
+* **Banks:** Index only by `branch_id` or `country_code` (Low Cardinality). Keep unique `account_number` and `transaction_id` (High Cardinality) inside the unindexed JSON log body to prevent the log database from crashing on memory load.
+* **Power Grids:** Index only by `grid_sector` or `substation_id`. Keep the individual `smart_meter_id` inside the JSON log body.
+* **AI Companies:** Index only by `model_name` (e.g. `deepseek-chat`) or `customer_tier`. Keep unique `prompt_id` or `session_token` inside the JSON log body.
+
+### C. Circuit Breakers (System Resilience)
+* **Banks:** If the external credit reference API (Equifax) goes down during a loan application, the breaker trips. The system fast-fails the network call and falls back to a local scoring algorithm (or flags it for manual human review) instead of presenting a crash screen.
+* **Power Grids:** If a lightning bolt snaps a cable, physical grid breakers trip instantly to isolate the surge and reroute current, preventing a cascading blackout across the city.
+* **AI Companies:** If a primary 70B model GPU cluster experiences network partition, the router breaker trips and degrades requests to a smaller 8B model fallback to keep the service responsive.
+
+---
+
+## 8. Summary of What We Built in This Workspace
 You now have a production-ready observability and resilience system:
 1. **Dynamic Service Discovery:** Prometheus auto-scrapes metrics across all dynamic tenant namespaces (`tenant-*`) thanks to ServiceMonitors and service labeling in `k8s.ts`.
 2. **End-to-End Tracing:** Frontend requests generate a W3C `traceparent` which traverses the Next.js middleware and logs performance timings back to the browser.
