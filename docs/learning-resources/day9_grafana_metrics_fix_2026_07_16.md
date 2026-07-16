@@ -45,14 +45,16 @@ Updated all panels to include the `{namespace=~"$namespace"}` filter:
    `sum(timeguild_booking_revenue_dollars_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})`
 3. **Completed Stripe Transfers**:
    `sum(timeguild_stripe_transfers_completed_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})`
-4. **Active BullMQ Queue Depth**:
+4. **Stripe Refunds / Cancellations**:
+   `sum(timeguild_stripe_escrow_refunds_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})`
+5. **Active BullMQ Queue Depth**:
    `timeguild_bullmq_queue_depth{namespace=~\"$namespace\"}`
-5. **Consulting Slot Availability Status**:
+6. **Consulting Slot Availability Status**:
    `timeguild_slots_total{namespace=~\"$namespace\",tenant=~\"$tenant\"}`
-6. **HTTP / DB Latencies**:
+7. **HTTP / DB Latencies**:
    `timeguild_http_request_duration_seconds_p95{namespace=~\"$namespace\",tenant=~\"$tenant\"}`
    `timeguild_db_query_duration_seconds{namespace=~\"$namespace\",tenant=~\"$tenant\"}`
-7. **Real-time Container Logs**:
+8. **Real-time Container Logs**:
    `{namespace=~\"$namespace\"}` (simplified because Promtail namespace relabeling only attaches the `tenant` label to tenant namespaces matching `tenant-(.*)`, so querying by namespace directly is the most robust way to support both dev and customer logs)
 
 ## 4. How to Verify

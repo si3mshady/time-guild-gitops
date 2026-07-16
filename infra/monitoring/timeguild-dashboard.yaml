@@ -68,7 +68,7 @@ data:
           },
           "gridPos": {
             "h": 4,
-            "w": 6,
+            "w": 5,
             "x": 0,
             "y": 1
           },
@@ -130,8 +130,8 @@ data:
           },
           "gridPos": {
             "h": 4,
-            "w": 6,
-            "x": 6,
+            "w": 5,
+            "x": 5,
             "y": 1
           },
           "id": 3,
@@ -192,8 +192,8 @@ data:
           },
           "gridPos": {
             "h": 4,
-            "w": 6,
-            "x": 12,
+            "w": 5,
+            "x": 10,
             "y": 1
           },
           "id": 4,
@@ -243,6 +243,68 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
+                    "color": "red",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 15,
+            "y": 1
+          },
+          "id": 101,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.5.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(timeguild_stripe_escrow_refunds_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})",
+              "legendFormat": "Refunds",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Stripe Refunds / Cancellations",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
                     "color": "purple",
                     "value": null
                   }
@@ -254,8 +316,8 @@ data:
           },
           "gridPos": {
             "h": 4,
-            "w": 6,
-            "x": 18,
+            "w": 4,
+            "x": 20,
             "y": 1
           },
           "id": 5,
