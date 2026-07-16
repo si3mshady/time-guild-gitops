@@ -60,6 +60,7 @@
 * **Batch Scheduling Slot Generator**: Developed `src/lib/slots.ts` slot generator that processes date ranges, active weekdays, and hours into available database slots.
 * **Onboarding UI Redesign**: Fully refactored `src/app/onboarding/page.tsx` to support flat/hourly billing toggles, session information fields, ZIP-code forms, and active weekday checkboxes for batch scheduler seeding.
 * **Dynamic Tag Growth & Boundaries Removal**: Cleaned up the personal boundaries matrix across the onboarding and creator profile interfaces to reflect a professional coaching platform. Implemented a dynamic tag selection API (`/api/tags`) combined with a text entry input to allow interest tags to grow automatically as new profiles publish. Added a DeepSeek AI tag generator endpoint (`/api/tags/generate`) to automatically extract professional activity tags from creator bios with keyword heuristic fallback.
+* **Concierge Wording Replacement**: Replaced all occurrences of the word "concierge" (case-insensitive) across UI components, Stripe Checkout session titles, and API routes to ensure professional branding.
 
 ---
 
