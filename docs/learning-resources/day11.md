@@ -23,9 +23,10 @@ Create `/api/bookings/reschedule` route handler:
 * Update the booking's `slot_id`, `booking_date`, and transaction records in a single database transaction. Transition old slot to `available` and new slot to `reserved`.
 
 ### C. Booking Cancellation Rules
-Update cancellation methods in `src/lib/trust-rules.ts`:
+Update cancellation methods in `src/lib/trust-rules.ts` and route handlers:
 * Ensure provider-initiated cancellations always return a 100% refund to the client.
 * Ensure client-initiated cancellations check the 24h buffer: refund 100% if >=24h notice, payout provider 85% if <24h.
+* Implement Stripe webhook handling for the `charge.refunded` event in `src/app/api/stripe/webhook/route.ts` to automatically transition booking status to `refunded` and release the slot back to `available` if a refund is processed on the Stripe Dashboard.
 
 ---
 
