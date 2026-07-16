@@ -64,6 +64,7 @@
 * **Hourly Slot Splitting & Duration Select**: Added slot splitting logic inside `/api/stripe/checkout` so that booking partial segments of an hourly availability slot shrinks the original slot and preserves the remaining hours. Refactored the creator profile booking dialog to conditionally render a Duration select dropdown when the creator's pricing is hourly, recalculating and displaying total pricing dynamically.
 * **Profile Persistence Race Condition Fix**: Introduced an `isLoaded` state flag to prevent client-side autosaver `useEffect` hooks from writing empty initial state parameters to local storage and database endpoints before user profile data has resolved asynchronously.
 * **Grafana Dashboard Collision Resolution**: Added a `$namespace` template variable to the Grafana dashboard ConfigMap and filtered all panel queries (Bookings, Revenue, Transfers, Slots, Latencies, Logs) by `namespace=~"$namespace"`. This prevents metrics from colliding and summing across dev, staging, prod, and user pods.
+* **Refund Webhook Handler**: Implemented a `charge.refunded` webhook case handler inside `/api/stripe/webhook` to dynamically process card refunds executed from Stripe, transition booking statuses to `refunded`, and automatically release availability slots back to `available`.
 
 ---
 
