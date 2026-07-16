@@ -38,3 +38,6 @@ Design a unified dashboard panel in Grafana:
     [https://prometheus-operator.dev/docs/user-guides/getting-started/](https://prometheus-operator.dev/docs/user-guides/getting-started/)
 *   **Grafana Dashboard Variables**: Study how to build dashboard templates using dropdown queries:  
     [https://grafana.com/docs/grafana/latest/dashboards/variables/](https://grafana.com/docs/grafana/latest/dashboards/variables/)
+*   **Interactive SRE Course & Guides** (Local References):
+    *   **[SRE Course Guide](file:///home/si3mshady/time-guild/SRE_COURSE_GUIDE.md)**: Conceptual deep dives on distributed tracing, low-cardinality indexing, and stateful circuit breakers.
+    *   **[SRE Case Study & LinkedIn Post](file:///home/si3mshady/time-guild/SRE_LINKEDIN_POST.md)**: Macro and micro reasons for observability autodiscovery in multi-tenant SaaS environments.
