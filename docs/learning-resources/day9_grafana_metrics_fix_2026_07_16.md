@@ -53,7 +53,7 @@ Updated all panels to include the `{namespace=~"$namespace"}` filter:
    `timeguild_http_request_duration_seconds_p95{namespace=~\"$namespace\",tenant=~\"$tenant\"}`
    `timeguild_db_query_duration_seconds{namespace=~\"$namespace\",tenant=~\"$tenant\"}`
 7. **Real-time Container Logs**:
-   `{namespace=~\"$namespace\",tenant=~\"$tenant\"}`
+   `{namespace=~\"$namespace\"}` (simplified because Promtail namespace relabeling only attaches the `tenant` label to tenant namespaces matching `tenant-(.*)`, so querying by namespace directly is the most robust way to support both dev and customer logs)
 
 ## 4. How to Verify
 1. Open Grafana at `http://localhost:3000`.

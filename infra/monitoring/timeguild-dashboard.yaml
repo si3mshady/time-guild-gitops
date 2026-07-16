@@ -510,7 +510,7 @@ data:
                 "uid": "Loki"
               },
               "editorMode": "code",
-              "expr": "{namespace=~\"$namespace\",tenant=~\"$tenant\"}",
+              "expr": "{namespace=~\"$namespace\"}",
               "queryType": "range",
               "refId": "A"
             }
