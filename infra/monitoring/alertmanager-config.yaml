@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: timeguild-alert-routing
+  namespace: timeguild-monitoring
+  labels:
+    release: prometheus-stack
+spec:
+  route:
+    groupBy: ['alertname', 'namespace']
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 12h
+    receiver: 'null'
+    routes:
+      - matchers:
+          - name: severity
+            value: critical
+        receiver: 'pagerduty-critical'
+      - matchers:
+          - name: severity
+            value: warning
+        receiver: 'slack-warnings'
+  receivers:
+    - name: 'null'
+    - name: 'pagerduty-critical'
+      webhookConfigs:
+        - url: 'http://localhost:5001/alerts/critical'
+          sendResolved: true
+    - name: 'slack-warnings'
+      webhookConfigs:
+        - url: 'http://localhost:5001/alerts/warning'
+          sendResolved: true

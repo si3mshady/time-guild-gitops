@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: timeguild-alerts
+  namespace: timeguild-monitoring
+  labels:
+    release: prometheus-stack
+spec:
+  groups:
+    - name: timeguild-payment-alerts
+      rules:
+        - alert: StripeWebhookHighErrorRate
+          expr: |
+            sum(rate(timeguild_http_requests_total{path="/api/stripe/webhook", status!~"2.."}[5m])) 
+            / 
+            sum(rate(timeguild_http_requests_total{path="/api/stripe/webhook"}[5m])) > 0.01
+          for: 2m
+          labels:
+            severity: critical
+            tier: billing
+          annotations:
+            summary: "Stripe Webhook experiencing >1% error rate on namespace {{ $labels.namespace }}"
+            description: "The payment processing webhook is failing. Escrow status transitions and payouts are blocked."
+            runbook_url: "https://github.com/si3mshady/time-guild/blob/main/docs/runbooks/stripe-webhook-failures.md"
+        - alert: BookingLatencyHigh
+          expr: |
+            sum(rate(timeguild_http_request_duration_seconds_bucket{path="/api/creators", le="0.5"}[5m]))
+            /
+            sum(rate(timeguild_http_request_duration_seconds_count{path="/api/creators"}[5m])) < 0.95
+          for: 5m
+          labels:
+            severity: warning
+            tier: application
+          annotations:
+            summary: "Booking API latency > 500ms on namespace {{ $labels.namespace }}"
+            description: "Over 5% of creator API requests are taking longer than 500ms. Booking experience is degraded."
+            runbook_url: "https://github.com/si3mshady/time-guild/blob/main/docs/runbooks/booking-api-latency.md"
