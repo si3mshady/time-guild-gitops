@@ -59,7 +59,7 @@
 * **Proximity Zip-Code Mapping**: Integrated offline coordinate resolution inside `src/lib/location.ts` mapping 5-digit ZIP codes to approximate coordinates, bypassing browser location API permission blocks.
 * **Batch Scheduling Slot Generator**: Developed `src/lib/slots.ts` slot generator that processes date ranges, active weekdays, and hours into available database slots.
 * **Onboarding UI Redesign**: Fully refactored `src/app/onboarding/page.tsx` to support flat/hourly billing toggles, session information fields, ZIP-code forms, and active weekday checkboxes for batch scheduler seeding.
-* **Dynamic Tag Growth & Boundaries Removal**: Cleaned up the personal boundaries matrix across the onboarding and creator profile interfaces to reflect a professional coaching platform. Implemented a dynamic tag selection API (`/api/tags`) combined with a text entry input to allow interest tags to grow automatically as new profiles publish.
+* **Dynamic Tag Growth & Boundaries Removal**: Cleaned up the personal boundaries matrix across the onboarding and creator profile interfaces to reflect a professional coaching platform. Implemented a dynamic tag selection API (`/api/tags`) combined with a text entry input to allow interest tags to grow automatically as new profiles publish. Added a DeepSeek AI tag generator endpoint (`/api/tags/generate`) to automatically extract professional activity tags from creator bios with keyword heuristic fallback.
 
 ---
 
