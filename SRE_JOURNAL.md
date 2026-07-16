@@ -46,6 +46,14 @@
 * **Kubernetes Tenant Namespace Clean up Automation:** Integrated automatic Kubernetes namespace clean up directly into the database reset endpoint (`src/app/api/admin/reset/route.ts`). When a "Nuke DB" reset is triggered, the server calls the Kubernetes API using its in-cluster ServiceAccount to delete all dynamic namespaces matching the label `type=tenant`. This guarantees that subsequent demo runs provision clean pods running the current container image, avoiding old image cache/staleness issues on creator domains.
 * **Next.js Client GET Request Cache-Busting:** Disabled GET request caching on the `/api/auth/user` endpoint by passing `{ cache: "no-store" }` to client-side `fetch` in `src/components/auth-provider.tsx` and returning `Cache-Control: no-store, max-age=0, must-revalidate` headers from `src/app/api/auth/user/route.ts`. This resolved the role selection screen update lag, ensuring that changes to the user's role state are immediately rendered on the UI.
 
+### 2026-07-16 - Day 8: Service Level Indicators (SLIs), Service Level Objectives (SLOs), and Prometheus Alerting Rules
+* **Exposition Format Metric Alignment:** Renamed the HTTP latency gauge metric from `timeguild_http_request_duration_seconds` to `timeguild_http_request_duration_seconds_p95` to avoid type conflicts with the histogram of the same name.
+* **Exposed SLO Metrics:** Added `timeguild_http_requests_total` counter (measuring Stripe webhook counts and Creator profile endpoint hits) and the `timeguild_http_request_duration_seconds` histogram (exposing cumulative duration buckets for `/api/creators` requests) in `src/app/api/metrics/route.ts`.
+* **Prometheus Alerting Rules:** Created and applied `prometheus-rules.yaml` containing alert configurations for critical-path Stripe webhook errors (`StripeWebhookHighErrorRate`) and tolerable-path booking API latency warnings (`BookingLatencyHigh`).
+* **Alertmanager Routing Setup:** Configured an `AlertmanagerConfig` resource (`alertmanager-config.yaml`) to route `critical` alerts to PagerDuty (`pagerduty-critical`) and `warning` alerts to Slack (`slack-warnings`) with grouped namespaces.
+* **Grafana Dashboard Refinement:** Updated and re-applied the `timeguild-dashboard` ConfigMap (`timeguild-dashboard.yaml`) to use the new `timeguild_http_request_duration_seconds_p95` metric for visualizing response latencies.
+* **SRE Runbooks Deployment:** Authored step-by-step troubleshooting runbooks for webhook failures and API latencies under `docs/runbooks/`.
+
 ---
 
 ## 3. Demo Walkthrough & Recovery Playbook
