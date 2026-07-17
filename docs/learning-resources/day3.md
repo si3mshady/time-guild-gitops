@@ -1,5 +1,8 @@
 # Day 3: AWS EC2 Prep, Elastic IP, DNS, & K3s Verification
 
+> [!NOTE]
+> **Status: COMPLETED**
+
 Tomorrow, you will resume your work starting with this file.
 
 ---

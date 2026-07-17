@@ -1,5 +1,8 @@
 # Day 5: cert-manager Wildcard SSL & Traefik Default TLS Store
 
+> [!NOTE]
+> **Status: COMPLETED**
+
 ---
 
 ## 1. Architectural Rationale: Why We Do This

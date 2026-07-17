@@ -1,5 +1,8 @@
 # Day 6: Dynamic Tenant Namespace Provisioning (REST API Integration)
 
+> [!NOTE]
+> **Status: COMPLETED**
+
 ---
 
 ## 1. Architectural Rationale: Why We Do This

@@ -1,5 +1,8 @@
 # Day 12: AI Trust & Safety & Twilio Proxy Communication
 
+> [!WARNING]
+> **Status: OUTSTANDING (Future Phase)**
+
 ---
 
 ## 1. Architectural Rationale: Why We Do This

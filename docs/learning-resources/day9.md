@@ -1,5 +1,8 @@
 # Day 9: Onboarding, Scheduling & Pricing Engine
 
+> [!NOTE]
+> **Status: COMPLETED**
+
 ---
 
 ## 1. Architectural Rationale: Why We Do This

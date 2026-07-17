@@ -1,5 +1,8 @@
 # Day 8: Service Level Indicators (SLIs), Service Level Objectives (SLOs), and Prometheus Alerting Rules
 
+> [!NOTE]
+> **Status: COMPLETED**
+
 ---
 
 ## 1. Architectural Rationale: Why We Do This

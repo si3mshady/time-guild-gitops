@@ -1,5 +1,8 @@
 # Day 7: Observability Auto-Discovery in Dynamic Namespaces
 
+> [!NOTE]
+> **Status: COMPLETED**
+
 ---
 
 ## 1. Architectural Rationale: Why We Do This

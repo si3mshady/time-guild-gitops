@@ -1,5 +1,8 @@
 # Day 2: Production Containerization, Docker Hub, & CI/CD
 
+> [!NOTE]
+> **Status: COMPLETED**
+
 On Day 2, we focused on cleaning up technical debt, preparing the production Docker image, and automating builds via GitHub Actions.
 
 ---

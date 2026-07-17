@@ -1,5 +1,8 @@
 # Day 13: Observability Verification & End-to-End Testing
 
+> [!WARNING]
+> **Status: OUTSTANDING (Future Phase)**
+
 ---
 
 ## 1. Architectural Rationale: Why We Do This

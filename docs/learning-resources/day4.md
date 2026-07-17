@@ -1,5 +1,8 @@
 # Day 4: Helm Chart & ArgoCD Multi-Repo GitOps
 
+> [!NOTE]
+> **Status: COMPLETED**
+
 ---
 
 ## 1. Architectural Rationale: Why We Do This
