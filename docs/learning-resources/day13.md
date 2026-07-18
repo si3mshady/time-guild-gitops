@@ -1,41 +1,38 @@
-# Day 13: Observability Verification & End-to-End Testing
+# Day 13: Calendar Enhancements & Schedule Refining
 
-> [!WARNING]
-> **Status: OUTSTANDING (Future Phase)**
+> [!IMPORTANT]
+> **Status: OUTSTANDING (Current Active Day of Work)**
 
 ---
 
 ## 1. Architectural Rationale: Why We Do This
-Validating system reliability before launching to real users requires observing both technical signals (latencies, errors) and business metrics (revenue, platform fees, booking success rates) side-by-side.
-* **Business KPI Telemetry**: Exposing high-level financial metrics directly in Prometheus exposition format lets platform administrators monitor transaction volumes, payout splits, and pricing model usage.
-* **End-to-End Simulation**: Running automated CLI scenarios simulating onboarding, booking, checkout, webhook callbacks, and final payouts verifies the system's resilience under realistic load.
+Refining the provider availability setup to support a visual calendar dashboard (rather than form-based hour lists) simplifies session scheduling and increases overall customer booking completion rates.
+* **Interactive Slot Calendar**: Providers should be able to view their scheduled blocks in a visual monthly/weekly calendar grid.
+* **Refined Booking Flows**: Clients booking on a provider's public profile page should select available sessions directly from an interactive calendar interface instead of a raw select dropdown list.
 
 ---
 
 ## 2. Core Tasks
 
-### A. Expose Business metrics
-Add the following financial metric gauges to `src/app/api/metrics/route.ts`:
-* `timeguild_platform_commission_dollars_total`: Cumulative platform commission fees retained (15% or 5%).
-* `timeguild_provider_payouts_dollars_total`: Cumulative net payouts transferred to connected Express accounts.
-* `timeguild_pricing_model_usage_total`: Counts grouped by `{type="flat"}` and `{type="hourly"}` to monitor popularity of models.
+### A. Custom Interactive Calendar UI
+Replace the grid list with a monthly/weekly interactive calendar visualization:
+* Integrate a visual calendar component (or custom lightweight grid calendar).
+* Visualize slot availability status (e.g. green for available, yellow for reserved, indigo/gray for booked) on calendar days and timeblocks.
 
-### B. Update Grafana dashboard ConfigMap
-Edit the `timeguild-dashboard.yaml` manifest in `time-guild-gitops`:
-* Add a financial metrics panel section visualizing platform commission margins, total payouts executed, and current escrow holdings.
-* Add a gauge panel displaying the distribution of flat-rate vs. hourly bookings.
-* Re-apply the updated ConfigMap to the cluster namespace.
+### B. Visual Planner Schedule
+Allow providers to see their slot schedule at a glance:
+* Hover states detailing rate info (Flat vs Variable), booking IDs, client details.
+* Quick filters by week and month.
 
-### C. Run End-to-End Booking Simulation
-Create a testing CLI script `/infra/scripts/test-e2e-bookings.sh` that:
-* Signs up a new provider, onboards availability rules, and creates multiple slots.
-* Signs up a customer, qualifications agent chat, and triggers Stripe Checkout.
-* Sends mock webhook callbacks (`payment_intent.succeeded`) to verify state transitions and SCT transfers.
+### C. Client-Side Interactive Slot Selector
+Upgrade the booking panel in `src/app/creator/[id]/page.tsx` public page:
+* Allow clients to pick available dates/times from an interactive calendar interface.
+* Prevent scheduling conflicts and show pricing mode transparency (flat vs variable rate) directly on selection.
 
 ---
 
 ## 3. Study & Reference Materials
-* **Prometheus Instrumenting Business Metrics**: Study how to instrument business KPIs safely:  
-  [https://prometheus.io/docs/practices/instrumentation/](https://prometheus.io/docs/practices/instrumentation/)
-* **Grafana Dashboard Panel Design**: Best practices for constructing single-pane dashboard grids:  
-  [https://grafana.com/docs/grafana/latest/panels-visualizations/](https://grafana.com/docs/grafana/latest/panels-visualizations/)
+* **Designing Calendar Booking Interfaces**: Guidelines for booking UX patterns:  
+  [https://uxdesign.cc/designing-a-booking-system/](https://uxdesign.cc/designing-a-booking-system/)
+* **React Calendar & Custom Grid Layouts**: Techniques for building CSS Grid Calendars:  
+  [https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Real-world_layout_control](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Real-world_layout_control)
