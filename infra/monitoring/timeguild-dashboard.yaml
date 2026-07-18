@@ -163,7 +163,7 @@ data:
               "refId": "A"
             }
           ],
-          "title": "Total Escrow Revenue",
+          "title": "Total Holding Revenue",
           "type": "stat"
         },
         {
@@ -281,7 +281,7 @@ data:
                 "uid": "Prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(timeguild_stripe_escrow_refunds_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})",
+              "expr": "sum(timeguild_stripe_holding_refunds_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})",
               "legendFormat": "Refunds",
               "range": true,
               "refId": "A"

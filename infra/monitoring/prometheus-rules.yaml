@@ -20,7 +20,7 @@ spec:
             tier: billing
           annotations:
             summary: "Stripe Webhook experiencing >1% error rate on namespace {{ $labels.namespace }}"
-            description: "The payment processing webhook is failing. Escrow status transitions and payouts are blocked."
+            description: "The payment processing webhook is failing. Holding status transitions and payouts are blocked."
             runbook_url: "https://github.com/si3mshady/time-guild/blob/main/docs/runbooks/stripe-webhook-failures.md"
         - alert: BookingLatencyHigh
           expr: |
