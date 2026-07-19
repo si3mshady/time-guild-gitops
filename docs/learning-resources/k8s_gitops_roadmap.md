@@ -1,147 +1,120 @@
-# GitOps & Kubernetes Implementation Roadmap (7-Day Plan)
+# GitOps & Kubernetes 14-Day Implementation Roadmap
 
-This roadmap details the step-by-step transition from your current **local Docker Compose** environment to a production-like, containerized, GitOps-managed **Kubernetes (K3s)** cluster running on an **AWS EC2 instance** with a **Namecheap domain** and **Elastic IP**.
-
-To ensure you gain deep operational understanding and do not experience a "false sense of security," each day includes curated **study and reference materials** to help you learn and articulate the core concepts.
+This roadmap details the step-by-step transition from a **local Docker Compose** environment to a production-like, containerized, GitOps-managed **Kubernetes (K3s)** cluster, alongside the implementation of all multi-tenant creator scheduling features, Stripe Connect integrations, and observability systems.
 
 ---
 
-## Maturity Gap Analysis (Docker Compose ──> Kubernetes GitOps)
+## Maturity Roadmap Overview
 
-Your current Docker Compose setup is **highly mature for local development**:
-*   Uses a multi-stage Alpine-based Bun Dockerfile for build/run.
-*   Orchestrates Next.js, Redis, Postgres, and a complete observability stack (Prometheus, Loki, Promtail, Grafana, Jaeger) locally.
-*   Uses volume mounts to enable live reloading of code.
-
-### The Delta: What We Need to Build for Kubernetes
-1.  **Image Distribution**: Move from local builds to pulling from a central registry (**Docker Hub**).
-2.  **Infrastructure Host**: Replace local Docker daemon with an **AWS EC2 instance** running **K3s (lightweight Kubernetes)**.
-3.  **DNS & Routing**: Replace port mappings (`3000:3000`) with a static **AWS Elastic IP** and a **Namecheap wildcard A-record** routing to a Kubernetes **Ingress controller (Traefik)**.
-4.  **Deployment Controller**: Replace Docker Compose commands with **ArgoCD (GitOps)** tracking a packaged **Helm Chart**.
-5.  **SSL/TLS**: Replace HTTP with **wildcard Let's Encrypt certificates** managed by `cert-manager` using Traefik's Default TLS Store.
-6.  **Dynamic Namespace Provisioning (Completed)**: Implement code inside Next.js to talk to the K3s API server and spin up namespaces/pods dynamically.
-7.  **Distributed Observability (Next Up)**: Re-configure Promtail/Prometheus to dynamically discover and label log and metric streams as new namespaces are spawned.
-
----
-
-## 7-Day Roadmap Timeline
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12 are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Day 14 is the FUTURE PHASE (Outstanding)**.
 
 ```text
-               [ Day 1: Completed Setup ]
-                           │
-                           ▼
-               [ Day 2: CI/CD & Docker Hub ]
-                           │
-                           ▼
-               [ Day 3: EC2, EIP, & K3s Setup ]
-                           │
-                           ▼
-               [ Day 4: Helm & ArgoCD GitOps ]
-                           │
-                           ▼
-               [ Day 5: Wildcard SSL & TLS Store ]
-                           │
-                           ▼
-               [ Day 6: Dynamic API Provisioner (Completed) ]
-                           │
-                           ▼
-               [ Day 7: Observability Autodiscovery (Next Up) ]
+               [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
+                                   │
+                                   ▼
+               [ Day 6 - Day 8: K8s Dynamic REST API & Observability ] (Completed)
+                                   │
+                                   ▼
+               [ Day 9 - Day 12: Business Engine, Payouts, & Slot Budgets ] (Completed)
+                                   │
+                                   ▼
+               [ Day 13: Interactive Calendars & Visual Schedule ] (Current Active Day)
+                                   │
+                                   ▼
+               [ Day 14: E2E Validation & Business KPIs ] (Future Phase)
 ```
 
 ---
 
-## Day 1 — Completed Foundation
-*   **Tasks Completed**: Username DNS-safe validation rules, database column migration scripts for SQLite and Postgres, Stripe Connect metadata mappings, and local observability testing.
+## Day 1 — Foundation & Stripe Connect Integration (COMPLETED)
+* **Goal**: Set up unique tenant checks, database lockouts, and Stripe Connect recipient onboarding.
+* **Tasks Completed**:
+  1. Implemented unique username validation and schema isolation rules.
+  2. Integrated Connect Express V2 registration routes.
+
+## Day 2 — Production Containerization & CI/CD (COMPLETED)
+* **Goal**: Package the app for cloud delivery using automated pipelines.
+* **Tasks Completed**:
+  1. Created a multi-stage Bun Alpine Dockerfile.
+  2. Setup GitHub Actions (`docker-publish.yml`) to automatically build and push to Docker Hub.
+
+## Day 3 — Cloud Host & DNS Wildcards (COMPLETED)
+* **Goal**: Spin up cloud hosts and map wildcard records.
+* **Tasks Completed**:
+  1. Configured AWS EC2 and associated a static AWS Elastic IP (EIP).
+  2. Mapped wildcard Namecheap DNS records (`*.yourdomain.com`).
+  3. Exported EC2 K3s kubeconfig for remote `kubectl` administration.
+
+## Day 4 — GitOps Engine & Helm Packaging (COMPLETED)
+* **Goal**: Sync deployment states using declarative GitOps models.
+* **Tasks Completed**:
+  1. Installed ArgoCD on K3s.
+  2. Refactored the Helm chart under `infra/helm` and configured an ArgoCD Application manifest.
+
+## Day 5 — cert-manager & Wildcard Ingress HTTPS (COMPLETED)
+* **Goal**: Secure dynamic routing paths automatically.
+* **Tasks Completed**:
+  1. Delegated DNS nameservers to Cloudflare for DNS-01 verification.
+  2. Provisioned Let's Encrypt wildcard certificate via `cert-manager`.
+  3. Configured Traefik default TLSStore for automatic subdomain HTTPS.
+
+## Day 6 — Dynamic Namespace Provisioner (COMPLETED)
+* **Goal**: Allow Next.js to spawn isolated tenant pods dynamically on creator signup.
+* **Tasks Completed**:
+  1. Bound Next.js service account to K8s Namespace/Ingress/Deployment creation rights.
+  2. Authored K8s REST helper client in `src/lib/k8s.ts`.
+
+## Day 7 — Observability Auto-Discovery (COMPLETED)
+* **Goal**: Auto-collect logs/metrics when tenant pods spin up.
+* **Tasks Completed**:
+  1. Configured Promtail Kubernetes service discovery rules.
+  2. Implemented dynamic ServiceMonitors matching `tenant-*` namespaces.
+
+## Day 8 — SRE SLIs, SLOs & Alerting Rules (COMPLETED)
+* **Goal**: Guard the cluster against latencies and failures.
+* **Tasks Completed**:
+  1. Deployed Prometheus alerting rules targeting SLOs (95% request latencies under 500ms).
+  2. Integrated Alertmanager rules.
+
+## Day 9 — Scheduling, Pricing Engine & Loki Queries (COMPLETED)
+* **Goal**: Support custom pricing models and simplify log troubleshooting.
+* **Tasks Completed**:
+  1. Designed flat vs hourly slots pricing with ZIP code validation.
+  2. Simplified Grafana Loki log panels to query logs by namespace.
+
+## Day 10 — Payment Consistency & Testing (COMPLETED)
+* **Goal**: Verify funds splits, platform commissions, and refunds.
+* **Tasks Completed**:
+  1. Written Vitest test coverage suite validating slot availability constraints.
+  2. Implemented Stripe webhook triggers for `charge.refunded` handling.
+
+## Day 11 — Rescheduling Workflows (COMPLETED)
+* **Goal**: Enable booking modifications, cancellations, and notifications.
+* **Tasks Completed**:
+  1. Implemented client/creator booking list endpoints.
+  2. Configured rescheduling rules (preventing alterations within 24 hours).
+
+## Day 12 — Slot UX Refinement & Weekly Budgets (COMPLETED)
+* **Goal**: Enforce weekly availability boundaries and optimize dashboards.
+* **Tasks Completed**:
+  1. Split dashboard screens into distinct tabs (**Client Bookings**, **Sessions I Booked**, **Availability**, **Stripe Onboarding**).
+  2. Grouped availability slots into daily grids.
+  3. Enforced timezone-safe weekly availability budgets (max slots).
 
 ---
 
-## Day 2 — Production Containerization, Docker Hub, & CI/CD
-*   **Goal**: Prepare the application container for cloud distribution and automate image building.
-*   **Tasks**:
-    1.  Validate the production-grade multi-stage [Dockerfile](file:///home/si3mshady/time-guild/Dockerfile) (ensuring standalone bundles fit K3s limitations).
-    2.  Write a GitHub Actions CI/CD workflow (`.github/workflows/docker-publish.yml`) that automatically builds, tags, and pushes the production image to **Docker Hub** on every merge to main.
-    3.  Modify your local `docker-compose.yaml` to pull and run this production image to verify container integrity without local workspace folder mounts.
-*   **Study & Articulation Resources**:
-    *   *Docker Multi-Stage Builds Guide*: [docs.docker.com/build/building/multi-stage/](https://docs.docker.com/build/building/multi-stage/)
-    *   *GitHub Actions Docker Publish Guide*: [docs.github.com/en/actions/publishing-packages/publishing-docker-images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images)
-    *   *Bun Alpine Image Optimization*: [bun.sh/guides/runtime/docker](https://bun.sh/guides/runtime/docker)
+## Day 13 — Calendar UX & Scheduling Enhancements (CURRENT ACTIVE - OUTSTANDING)
+* **Goal**: Replace flat form availability lists with calendar-based interfaces.
+* **Tasks**:
+  1. **Visual Planner Calendar**: Implement a monthly/weekly calendar grid on the creator dashboard showing available, booked, and reserved slot states.
+  2. **Visual Planner Schedule details**: Enable hover tooltips with pricing (flat/variable) and client profiles.
+  3. **Client-Side Selector**: Refactor the profile page slot dropdown into an interactive date/time calendar picker.
 
 ---
 
-## Day 3 — AWS EC2 Prep, Elastic IP, DNS, & K3s Installation
-*   **Goal**: Spin up and configure your target cloud host environment.
-*   **Tasks**:
-    1.  Provision an **AWS Elastic IP (EIP)** and associate it with your EC2 instance.
-    2.  Configure EC2 **Security Groups**: Open ports `80` (HTTP), `443` (HTTPS), and `6443` (Kubernetes API - restricted strictly to your local IP for security).
-    3.  Log into your **Namecheap account** and create two DNS records pointing to your Elastic IP:
-        *   `A Record` for `yourdomain.com`
-        *   `Wildcard A Record` (`*`) for `*.yourdomain.com`
-    4.  Install **K3s (lightweight Kubernetes)** on your EC2 instance using the quick-install script:
-        ```bash
-        curl -sfL https://get.k3s.io | sh -
-        ```
-    5.  Copy the kubeconfig file (`/etc/rancher/k3s/k3s.yaml`) to your local machine so you can run `kubectl` commands from your local CLI.
-*   **Study & Articulation Resources**:
-    *   *K3s Architecture and Quickstart Guide*: [docs.k3s.io/quick-start](https://docs.k3s.io/quick-start)
-    *   *Understanding AWS Elastic IPs*: [docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html)
-    *   *Namecheap: Setting Up Wildcard Subdomains*: [namecheap.com/support/knowledgebase/article.aspx/9769/2237/how-to-set-up-wildcard-subdomains/](https://www.namecheap.com/support/knowledgebase/article.aspx/9769/2237/how-to-set-up-wildcard-subdomains/)
-
----
-
-## Day 4 — Helm Chart Refactoring & ArgoCD Setup on K3s
-*   **Goal**: Establish a GitOps deployment engine that manages the core application using Helm.
-*   **Tasks**:
-    1.  Install **ArgoCD** into your K3s cluster.
-    2.  Refactor the Helm chart templates in [infra/helm/timeguild](file:///home/si3mshady/time-guild/infra/helm/timeguild):
-        *   Ensure it pulls the production image from your Docker Hub repository.
-        *   Add Liveness and Readiness probes to `/api/healthz`.
-        *   Configure Persistent Volume Claims (PVC) to persist `time_worth.db`.
-    3.  Create an ArgoCD Application file (`infra/argocd/timeguild-app.yaml`) tracking the Helm chart in your Git repository.
-    4.  Apply the ArgoCD manifest to trigger your first GitOps sync and verify your application is running on your EC2 instance.
-*   **Study & Articulation Resources**:
-    *   *ArgoCD Architectural Overview*: [argo-cd.readthedocs.io/en/stable/understand_concepts/](https://argo-cd.readthedocs.io/en/stable/understand_concepts/)
-    *   *Helm Charts 101*: [helm.sh/docs/chart_template_guide/getting_started/](https://helm.sh/docs/chart_template_guide/getting_started/)
-    *   *GitOps Deployment Principles*: [gitops.tech](https://www.gitops.tech/)
-
----
-
-## Day 5 — cert-manager Wildcard SSL & Traefik Default TLS Store
-*   **Goal**: Implement real HTTPS for all dynamic subdomains without copying certificate secrets.
-*   **Tasks**:
-    1.  Install **cert-manager** on your K3s cluster.
-    2.  Delegate your Namecheap DNS Nameservers to **Cloudflare** (Free tier) to enable DNS-01 API integrations.
-    3.  Configure a cert-manager `ClusterIssuer` using a Cloudflare API token.
-    4.  Request a wildcard SSL certificate (`*.yourdomain.com`) in the K3s `kube-system` namespace.
-    5.  Configure Traefik's `TLSStore` to use this wildcard certificate. This guarantees that any new tenant Ingress rules automatically get SSL without declaring individual TLS secrets.
-*   **Study & Articulation Resources**:
-    *   *ACME DNS-01 Cloudflare Issuer Setup*: [cert-manager.io/docs/configuration/acme/dns01/cloudflare/](https://cert-manager.io/docs/configuration/acme/dns01/cloudflare/)
-    *   *Traefik TLS Default Certificate Docs*: [doc.traefik.io/traefik/https/tls/#default-certificate](https://doc.traefik.io/traefik/https/tls/#default-certificate)
-    *   *How Let's Encrypt DNS-01 Challenges Work*: [letsencrypt.org/docs/challenge-types/#dns-01-challenge](https://letsencrypt.org/docs/challenge-types/#dns-01-challenge)
-
----
-
-## Day 6 — Dynamic Namespace Provisioner (REST API integration - Completed)
-*   **Goal**: Enable your Next.js application to dynamically spawn namespace clusters for registered users.
-*   **Tasks Completed**:
-    1.  Created a Kubernetes `ClusterRole` and `ClusterRoleBinding` granting your main Next.js Pod's ServiceAccount permissions to create and delete namespaces, deployments, services, and ingresses.
-    2.  Wrote a Kubernetes REST API client helper in your Next.js codebase (using standard `fetch` with the pod's mounted service account token in `src/lib/k8s.ts`).
-    3.  Updated the user registration endpoint: when a signup succeeds, Next.js calls the API to provision the `tenant-<username>` namespace and manifests in under 3 seconds.
-    4.  Deployed and verified: Sign up a user and verify that `username.yourdomain.com` immediately loads their isolated container containerized page.
-*   **Study & Articulation Resources**:
-    *   *Kubernetes REST API reference*: [kubernetes.io/docs/reference/using-api/api-concepts/](https://kubernetes.io/docs/reference/using-api/api-concepts/)
-    *   *Understanding Role-Based Access Control (RBAC)*: [kubernetes.io/docs/reference/access-authn-authz/rbac/](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
-    *   *Accessing the K8s API Server from a Pod*: [kubernetes.io/docs/tasks/run-application/access-api-from-pod/](https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/)
-
----
-
-## Day 7 — Observability Auto-Discovery (Prometheus & Loki - Next Up)
-*   **Goal**: Monitor log and metrics streams automatically as new tenant namespaces appear.
-*   **Tasks**:
-    1.  Deploy **Prometheus** and **Loki** to your K3s cluster.
-    2.  Configure **Promtail** daemonsets with Kubernetes service discovery rules: when a pod in a `tenant-<username>` namespace is created, Promtail must scrape its logs and attach the `tenant` label automatically.
-    3.  Configure Prometheus **ServiceMonitors** to scrape performance metrics per namespace using `namespaceSelector: any: true`.
-    4.  Design a Grafana Dashboard template: Add a `tenant` dropdown menu so you can view isolated performance graphs, response rates, and Loki log streams for any specific user.
-*   **Study & Articulation Resources**:
-    *   *Promtail Kubernetes Discovery Configuration*: [grafana.com/docs/loki/latest/send-data/promtail/configuration/#kubernetes_sd_config](https://grafana.com/docs/loki/latest/send-data/promtail/configuration/#kubernetes_sd_config)
-    *   *Prometheus Operator ServiceMonitor Tutorial*: [prometheus-operator.dev/docs/user-guides/getting-started/](https://prometheus-operator.dev/docs/user-guides/getting-started/)
-    *   *Grafana Dashboard Variables (Multi-Tenancy)*: [grafana.com/docs/grafana/latest/dashboards/variables/](https://grafana.com/docs/grafana/latest/dashboards/variables/)
+## Day 14 — Observability Verification & End-to-End Testing (FUTURE PHASE - OUTSTANDING)
+* **Goal**: Audit financial transaction metrics and script end-to-end verification workflows.
+* **Tasks**:
+  1. **Expose Business Metrics**: Expose commission balances, payout totals, and pricing model popularity via Prometheus gauges.
+  2. **Grafana ConfigMap updates**: Update the cluster ConfigMap dashboard.
+  3. **E2E Testing Script**: Develop `/infra/scripts/test-e2e-bookings.sh` to automatically simulate onboarding, checkout, webhook callbacks, and payouts.
