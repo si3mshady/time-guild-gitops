@@ -18,10 +18,13 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                [ Day 9 - Day 12: Business Engine, Payouts, & Slot Budgets ] (Completed)
                                    │
                                    ▼
-               [ Day 13: Interactive Calendars & Visual Schedule ] (Current Active Day)
+                [ Day 13: Interactive Calendars & Visual Schedule ] (Current Active Day)
                                    │
                                    ▼
-               [ Day 14: E2E Validation & Business KPIs ] (Future Phase)
+                [ Day 14: E2E Validation & Business KPIs ] (Future Phase)
+                                   │
+                                   ▼
+                [ Day 15: Testing Framework Restoration & E2E Validation ] (Future Phase)
 ```
 
 ---
@@ -118,3 +121,12 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
   1. **Expose Business Metrics**: Expose commission balances, payout totals, and pricing model popularity via Prometheus gauges.
   2. **Grafana ConfigMap updates**: Update the cluster ConfigMap dashboard.
   3. **E2E Testing Script**: Develop `/infra/scripts/test-e2e-bookings.sh` to automatically simulate onboarding, checkout, webhook callbacks, and payouts.
+
+---
+
+## Day 15 — Testing Framework Restoration & E2E Validation (FUTURE PHASE - OUTSTANDING)
+* **Goal**: Re-architect and restore Vitest test suites aligning with the refactored database schemas and flexible booking rules.
+* **Tasks**:
+  1. **Codebase State Machine Audit**: Document dynamic slot-slicing bounds and state machine transition rules.
+  2. **Unit Test Suite Rebuild**: Write unit tests covering pricing, commission calculations, and late cancellation guards.
+  3. **Integration Test Suite Rebuild**: Write integration tests covering availability rule synchronization, Stripe Webhooks mock processing, and Stripe Connect split payout rules.
