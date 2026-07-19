@@ -3,7 +3,7 @@ replicaCount: 2
 image:
   repository: si3mshady/time-guild
   pullPolicy: IfNotPresent
-  tag: "sha-35e8139"
+  tag: "sha-414353e"
 
 serviceAccount:
   create: true
