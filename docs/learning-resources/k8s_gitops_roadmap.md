@@ -25,6 +25,9 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                                    │
                                    ▼
                 [ Day 15: Testing Framework Restoration & E2E Validation ] (Future Phase)
+                                   │
+                                   ▼
+                [ Day 16: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Future Phase)
 ```
 
 ---
@@ -130,3 +133,12 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
   1. **Codebase State Machine Audit**: Document dynamic slot-slicing bounds and state machine transition rules.
   2. **Unit Test Suite Rebuild**: Write unit tests covering pricing, commission calculations, and late cancellation guards.
   3. **Integration Test Suite Rebuild**: Write integration tests covering availability rule synchronization, Stripe Webhooks mock processing, and Stripe Connect split payout rules.
+
+---
+
+## Day 16 — Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry (FUTURE PHASE - OUTSTANDING)
+* **Goal**: Configure an Nginx edge proxy with WAF rules and rate-limiting zones to filter and monitor edge request traffic.
+* **Tasks**:
+  1. **Nginx Reverse Proxy & TLS Ingress**: Set up Nginx to terminate TLS and forward requests to internal cluster ingresses.
+  2. **API Rate Limiting**: Limit high-frequency API probes on sensitive paths like checkout and authentication routes.
+  3. **WAF Security & Telemetry Export**: Deploy OWASP Coraza WAF rules on Nginx, parse blocks to JSON, and collect/forward security alerts to Prometheus & Grafana.
