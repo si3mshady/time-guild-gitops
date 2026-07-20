@@ -6,7 +6,7 @@ This document evaluates the current maturity of the Time Guild project's contain
 
 ## 1. Current Status & Progress Summary
 
-The Time Guild application and deployment infrastructure are highly mature, having completed **14 out of 23** planned implementation phases (Days 1–12, Day 12-a, Day 13-a are COMPLETED; Day 13 is the CURRENT ACTIVE DAY; Day 13-b and Days 14–20 are FUTURE PHASES):
+The Time Guild application and deployment infrastructure are highly mature, having completed **15 out of 23** planned implementation phases (Days 1–12, Day 12-a, Day 13-a, and Day 13-b are COMPLETED; Day 13 is the CURRENT ACTIVE DAY; Days 14–20 are FUTURE PHASES):
 
 | Day | Focus Area | Status | Key Deliverables |
 | :--- | :--- | :--- | :--- |
@@ -24,8 +24,8 @@ The Time Guild application and deployment infrastructure are highly mature, havi
 | **Day 12** | Slot UX & Weekly Budgets | **COMPLETED** | Dashboard tabs, weekly slot budgets, flat vs variable toggles, grouped daily grids. |
 | **Day 12-a** | Flexible Scheduling & Lifecycle | **COMPLETED** | Session templates, recurring weekly availability windows + date overrides, dynamic slot engine. |
 | **Day 13-a** | Test Alignment & DB Integrity | **COMPLETED** | Prometheus metrics lifecycle states, safe SQLite migration pragmas, nuke/reset route, CI optimization. |
+| **Day 13-b** | LangGraph Next.js Scheduling Agent | **COMPLETED** | Next.js API route handler (`/api/agent/schedule`), serverless LangGraph state graph with DeepSeek API (`@langchain/deepseek`), slot reservation engine. |
 | **Day 13** | Visual Calendar & Scheduling | **CURRENT ACTIVE DAY (OUTSTANDING)** | Custom interactive calendar UI, visual planner grid, client-side selector. |
-| **Day 13-b** | LangGraph Next.js Scheduling Agent | **PLANNED PHASE (OUTSTANDING)** | Next.js API route handler (`/api/agent/schedule`), serverless LangGraph state graph, slot matching & reservation. |
 | **Day 14** | E2E Testing & Business Metrics | **FUTURE PHASE (OUTSTANDING)** | Financial metrics in `/api/metrics`, Grafana dashboards, E2E CLI simulation script. |
 | **Day 15** | Testing Framework Restoration | **FUTURE PHASE (OUTSTANDING)** | State machine audit, Vitest unit & integration test rebuilds for flexible scheduling & Stripe Connect. |
 | **Day 16** | Nginx Edge Proxy & WAF | **FUTURE PHASE (OUTSTANDING)** | Nginx reverse proxy, rate-limiting zones, OWASP Coraza WAF rules, Promtail JSON telemetry export. |
@@ -47,14 +47,7 @@ To bring the project to 100% production readiness aligned with 2026 AI-era DevOp
   2. **Visual Planner Schedule**: Implement hover cards with slot pricing information (flat vs variable), client details, and quick filter toggles on the dashboard.
   3. **Client-Side Selector**: Refactor the available slot select dropdown on the public creator profile page to load a calendar picker interface that prevents conflicts and enforces pricing type transparency.
 
-### B. LangGraph Next.js Serverless Scheduling Agent Engine (Day 13-b - Outstanding)
-* **Goal**: Embed a stateful LangGraph scheduling agent directly behind a Next.js App Router API endpoint (`/api/agent/schedule`) without external Express microservices.
-* **Outstanding Actions**:
-  1. **LangGraph State Graph Setup**: Build `src/lib/agent/scheduling-graph.ts` defining nodes for `fetch_creator_constraints`, `evaluate_slot_matches`, `lock_and_reserve_slot`, and `generate_checkout_session`.
-  2. **Serverless API Route Handler**: Implement Next.js POST handler in `src/app/api/agent/schedule/route.ts` executing the compiled graph in-process.
-  3. **Telemetry & Observability**: Emit structured `[OBSERVABILITY]` logs and expose Prometheus request/latency gauges.
-
-### C. Business Telemetry & E2E Validation (Day 14 - Future Phase - Outstanding)
+### B. Business Telemetry & E2E Validation (Day 14 - Future Phase - Outstanding)
 * **Goal**: Monitor the business performance layer and run end-to-end automated booking checks.
 * **Outstanding Actions**:
   1. **Expose Business Metrics**: Instrument `/api/metrics` to expose financial telemetry:
@@ -64,28 +57,28 @@ To bring the project to 100% production readiness aligned with 2026 AI-era DevOp
   2. **Grafana ConfigMap Update**: Update `timeguild-dashboard.yaml` to include visual charts for commissions, net payouts, and pricing model distribution.
   3. **End-to-End Test Script**: Author `infra/scripts/test-e2e-bookings.sh` to script simulation of creator signup, slot generation, customer qualification, checkout redirection, and webhook payouts.
 
-### D. Testing Framework Restoration & E2E Validation (Day 15 - Future Phase - Outstanding)
+### C. Testing Framework Restoration & E2E Validation (Day 15 - Future Phase - Outstanding)
 * **Goal**: Re-architect and restore automated unit and integration testing suites aligning with refactored schemas, slot-syncing logic, and Stripe Connect split rules.
 * **Outstanding Actions**:
   1. **Codebase State Machine Audit**: Document dynamic slot-slicing bounds and state machine transition rules.
   2. **Rebuild Unit Test Suite**: Write unit tests covering pricing, commission scaling (15% vs 5%), and late cancellation guards.
   3. **Rebuild Integration Test Suite**: Write integration tests covering availability rule synchronization, Stripe Webhooks mock processing, and Stripe Connect split payout rules.
 
-### E. Nginx Edge Reverse Proxy, Rate Limiting, & WAF Security Telemetry (Day 16 - Future Phase - Outstanding)
+### D. Nginx Edge Reverse Proxy, Rate Limiting, & WAF Security Telemetry (Day 16 - Future Phase - Outstanding)
 * **Goal**: Configure an Nginx edge proxy with WAF rules and rate-limiting zones to filter and monitor edge request traffic.
 * **Outstanding Actions**:
   1. **Nginx Reverse Proxy & TLS Ingress**: Route traffic to Traefik/Next.js services with TLS termination and downstream header forwarding.
   2. **API Rate Limiting**: Limit high-frequency API probes on sensitive authentication and checkout routes.
   3. **WAF Security & Telemetry Export**: Deploy OWASP Coraza WAF rules on Nginx, parse security blocks to JSON, and collect alerts via Prometheus & Grafana.
 
-### F. OpenTelemetry Distributed Tracing & Unified APM (Day 17 - Future Phase - Outstanding)
+### E. OpenTelemetry Distributed Tracing & Unified APM (Day 17 - Future Phase - Outstanding)
 * **Goal**: Full distributed tracing across API routes, Stripe webhooks, database calls, and async jobs to monitor entire user transaction journeys.
 * **Outstanding Actions**:
   1. **OpenTelemetry Node SDK**: Configure `@opentelemetry/sdk-node` in Next.js `instrumentation.ts`.
   2. **End-to-End Journey Tracing**: Instrument spans connecting Creator Onboarding → Availability Setup → Booking Checkout → Stripe Webhooks → Connected Account Transfer.
   3. **SLO Alerting**: Define P95 latency alerts (<500ms) and error-budget burn rates on critical payment routes.
 
-### G. AI FinOps, LLM Tracing & Security Guardrails (Day 18 - Future Phase - Outstanding)
+### F. AI FinOps, LLM Tracing & Security Guardrails (Day 18 - Future Phase - Outstanding)
 * **Goal**: Implement token-level cost attribution, LLM performance telemetry, and AI security guardrails.
 * **Outstanding Actions**:
   1. **Token Cost Attribution**: Expose Prometheus metrics (`timeguild_llm_tokens_total`, `timeguild_llm_cost_cents_total`) grouped by model, tenant, and action.
@@ -93,14 +86,14 @@ To bring the project to 100% production readiness aligned with 2026 AI-era DevOp
   3. **AI Guardrails Layer**: Implement middleware for prompt injection detection, PII sanitization, and output moderation.
   4. **Incident Summary Agent**: Deploy an agentic hook to auto-summarize Loki error bursts into actionable SRE incident notes.
 
-### H. Model Context Protocol (MCP) Integration Infrastructure (Day 19 - Future Phase - Outstanding)
+### G. Model Context Protocol (MCP) Integration Infrastructure (Day 19 - Future Phase - Outstanding)
 * **Goal**: Enable platform AI agents to securely connect to external tools and data sources via MCP.
 * **Outstanding Actions**:
   1. **MCP Server Integration**: Implement `src/lib/mcp/server.ts` exposing Time Guild primitives (bookings, slots, creator profiles) as standard MCP tool endpoints.
   2. **MCP Client & Agent Orchestration**: Equip internal agents with MCP client capabilities to query external systems (calendars, GitHub, web data) dynamically.
   3. **Granular Permissions & Tool Auth**: Enforce RBAC and token isolation for external tool invocation.
 
-### I. K8s AI Workload Hardening & Outcome-Based Analytics (Day 20 - Future Phase - Outstanding)
+### H. K8s AI Workload Hardening & Outcome-Based Analytics (Day 20 - Future Phase - Outstanding)
 * **Goal**: Harden Kubernetes for AI/inference payloads and establish outcome-based pricing analytics.
 * **Outstanding Actions**:
   1. **Pod Resource Limits & Autoscaling**: Configure explicit CPU/memory limits, HPA/KEDA autoscaling rules, and PodDisruptionBudgets.
@@ -112,6 +105,5 @@ To bring the project to 100% production readiness aligned with 2026 AI-era DevOp
 ## 3. Immediate Action Plan
 
 1. **Finish Active Day 13**: Deliver the Interactive Calendar Dashboard and Client-Side Slot Picker.
-2. **Execute Day 13-b**: Build the LangGraph serverless scheduling agent endpoint in Next.js (`/api/agent/schedule`).
-3. **Execute Days 14–16**: Complete Business Telemetry, Test Suite Restoration, and Nginx Edge WAF.
-4. **Roll out Days 17–20 (2026 AI-Era DevOps Stack)**: Implement OpenTelemetry APM, AI FinOps/Guardrails, MCP integration, and K8s AI workload hardening.
+2. **Execute Days 14–16**: Complete Business Telemetry, Test Suite Restoration, and Nginx Edge WAF.
+3. **Roll out Days 17–20 (2026 AI-Era DevOps Stack)**: Implement OpenTelemetry APM, AI FinOps/Guardrails, MCP integration, and K8s AI workload hardening.

@@ -6,7 +6,7 @@ This roadmap details the step-by-step transition from a **local Docker Compose**
 
 ## Maturity Roadmap Overview
 
-We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12, Day 12-a, and Day 13-a are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Day 13-b and Days 14 through 20 are FUTURE PHASES (Outstanding)**.
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12, Day 12-a, Day 13-a, and Day 13-b are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Days 14 through 20 are FUTURE PHASES (Outstanding)**.
 
 ```text
                [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
@@ -24,10 +24,10 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                [ Day 13-a: Test Suite Alignment, Telemetry & DB Integrity ] (Completed)
                                    │
                                    ▼
-                [ Day 13: Interactive Calendars & Visual Schedule ] (Current Active Day - Outstanding)
+               [ Day 13-b: LangGraph Next.js Scheduling Agent Engine & DeepSeek API ] (Completed)
                                    │
                                    ▼
-                [ Day 13-b: LangGraph Next.js Serverless Scheduling Agent Engine ] (Planned Phase - Outstanding)
+                [ Day 13: Interactive Calendars & Visual Schedule ] (Current Active Day - Outstanding)
                                    │
                                    ▼
                 [ Day 14: Observability Verification & End-to-End Testing ] (Future Phase - Outstanding)
@@ -144,6 +144,14 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
   3. Overhauled `/api/admin/reset` nuke route to drop and cleanly rebuild all tables and seed data.
   4. Optimized `.github/workflows/docker-publish.yml` to remove stale Vitest runners until Day 15 restoration.
 
+## Day 13-b — LangGraph Next.js Serverless Scheduling Agent Engine & DeepSeek API (COMPLETED)
+* **Goal**: Embed a stateful LangGraph scheduling agent directly inside Next.js App Router API endpoints (`/api/agent/schedule`) powered by DeepSeek API (`@langchain/deepseek`).
+* **Tasks Completed**:
+  1. Created `src/lib/agent/scheduling-graph.ts` defining state nodes for constraint fetching, DeepSeek LLM / rule slot matching, atomic slot locking, and Stripe checkout session generation.
+  2. Implemented Next.js POST handler in `src/app/api/agent/schedule/route.ts` executing the compiled state graph in-process without external Express services.
+  3. Integrated `@langchain/deepseek` (`ChatDeepSeek` / `deepseek-chat`) reading `DEEPSEEK_API_KEY`.
+  4. Tested and verified end-to-end booking reservation creation (`pending_payment`), `[OBSERVABILITY]` logging, and Stripe Checkout URL generation.
+
 ---
 
 ## Day 13 — Calendar UX & Scheduling Enhancements (CURRENT ACTIVE DAY - OUTSTANDING)
@@ -152,15 +160,6 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
   1. **Visual Planner Calendar**: Implement a monthly/weekly calendar grid on the creator dashboard showing available, booked, and reserved slot states.
   2. **Visual Planner Schedule details**: Enable hover tooltips with pricing (flat/variable) and client profiles.
   3. **Client-Side Selector**: Refactor the profile page slot dropdown into an interactive date/time calendar picker.
-
----
-
-## Day 13-b — LangGraph Next.js Serverless Scheduling Agent Engine (PLANNED PHASE - OUTSTANDING)
-* **Goal**: Embed a stateful LangGraph scheduling agent directly inside Next.js App Router API endpoints (`/api/agent/schedule`).
-* **Tasks**:
-  1. **LangGraph State Graph Architecture**: Implement `src/lib/agent/scheduling-graph.ts` defining state nodes for constraint fetching, LLM/rule slot matching, atomic slot locking, and Stripe checkout session generation.
-  2. **Serverless API Route Handler**: Implement Next.js POST endpoint in `src/app/api/agent/schedule/route.ts` executing the compiled state graph in-process without external Express services.
-  3. **Telemetry & Observability**: Emit structured `[OBSERVABILITY]` logs and expose agent execution metrics in Prometheus exposition format.
 
 ---
 
