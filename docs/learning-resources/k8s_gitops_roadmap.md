@@ -6,7 +6,7 @@ This roadmap details the step-by-step transition from a **local Docker Compose**
 
 ## Maturity Roadmap Overview
 
-We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12, Day 12-a, Day 13-a, and Day 13-b are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Days 14 through 20 are FUTURE PHASES (Outstanding)**.
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12, Day 12-a, Day 13-a, Day 13-b, and Day 13-c are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Days 14 through 20 are FUTURE PHASES (Outstanding)**.
 
 ```text
                [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
@@ -25,6 +25,9 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                                    │
                                    ▼
                [ Day 13-b: LangGraph Next.js Scheduling Agent Engine & DeepSeek API ] (Completed)
+                                   │
+                                   ▼
+               [ Day 13-c: LangGraph Supervisor Multi-Agent System & Domain Tools ] (Completed)
                                    │
                                    ▼
                 [ Day 13: Interactive Calendars & Visual Schedule ] (Current Active Day - Outstanding)
@@ -151,6 +154,14 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
   2. Implemented Next.js POST handler in `src/app/api/agent/schedule/route.ts` executing the compiled state graph in-process without external Express services.
   3. Integrated `@langchain/deepseek` (`ChatDeepSeek` / `deepseek-chat`) reading `DEEPSEEK_API_KEY`.
   4. Tested and verified end-to-end booking reservation creation (`pending_payment`), `[OBSERVABILITY]` logging, and Stripe Checkout URL generation.
+
+## Day 13-c — LangGraph Supervisor Multi-Agent System & Domain Tools Architecture (COMPLETED)
+* **Goal**: Build a Supervisor Router Agent orchestrating specialized sub-agents (`provider_setup`, `client_booking`, `lifecycle_support`) using thin domain tools over backend DB & Stripe APIs.
+* **Tasks Completed**:
+  1. Authored domain tool modules: `provider-tools.ts` (`get_listing`, `update_listing`, `get_availability`, `update_availability`), `client-tools.ts` (`search_availability`, `create_booking_draft`, `initiate_stripe_checkout`), and `lifecycle-tools.ts` (`get_booking_state`, `change_booking_state`, `query_payouts`).
+  2. Built Supervisor Router state graph machine in `src/lib/agent/supervisor-graph.ts` using LangGraph.js + DeepSeek API (`@langchain/deepseek`).
+  3. Implemented Next.js API route handler `POST /api/agent/supervisor` in `src/app/api/agent/supervisor/route.ts`.
+  4. Tested intent routing, slot reservations, cancellation state machine transitions, and structured `[OBSERVABILITY]` event logging.
 
 ---
 
