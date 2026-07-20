@@ -6,7 +6,7 @@ This roadmap details the step-by-step transition from a **local Docker Compose**
 
 ## Maturity Roadmap Overview
 
-We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12, Day 12-a, Day 13-a, Day 13-b, and Day 13-c are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Days 14 through 20 are FUTURE PHASES (Outstanding)**.
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 13, Day 12-a, Day 13-a, Day 13-b, and Day 13-c are fully COMPLETED**, **Day 14 is the NEXT ACTIVE PHASE (Outstanding)**, and **Days 15 through 20 are FUTURE PHASES (Outstanding)**.
 
 ```text
                [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
@@ -30,10 +30,10 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                [ Day 13-c: LangGraph Supervisor Multi-Agent System & Domain Tools ] (Completed)
                                    │
                                    ▼
-                [ Day 13: Interactive Calendars & Visual Schedule ] (Current Active Day - Outstanding)
+               [ Day 13: Interactive Calendars & Visual Schedule ] (Completed)
                                    │
                                    ▼
-                [ Day 14: Observability Verification & End-to-End Testing ] (Future Phase - Outstanding)
+                [ Day 14: Observability Verification & End-to-End Testing ] (Next Active Phase - Outstanding)
                                    │
                                    ▼
                 [ Day 15: Testing Framework Restoration & E2E Validation ] (Future Phase - Outstanding)
@@ -163,18 +163,16 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
   3. Implemented Next.js API route handler `POST /api/agent/supervisor` in `src/app/api/agent/supervisor/route.ts`.
   4. Tested intent routing, slot reservations, cancellation state machine transitions, and structured `[OBSERVABILITY]` event logging.
 
----
-
-## Day 13 — Calendar UX & Scheduling Enhancements (CURRENT ACTIVE DAY - OUTSTANDING)
-* **Goal**: Replace flat form availability lists with calendar-based interfaces.
-* **Tasks**:
-  1. **Visual Planner Calendar**: Implement a monthly/weekly calendar grid on the creator dashboard showing available, booked, and reserved slot states.
-  2. **Visual Planner Schedule details**: Enable hover tooltips with pricing (flat/variable) and client profiles.
-  3. **Client-Side Selector**: Refactor the profile page slot dropdown into an interactive date/time calendar picker.
+## Day 13 — Visual Calendar UX & Scheduling Enhancements (COMPLETED)
+* **Goal**: Replace flat form availability lists with calendar-based interfaces for creators and clients.
+* **Tasks Completed**:
+  1. Built a 7-column monthly/weekly visual calendar grid on the creator dashboard with month controls (`‹ Prev Month`, `Today`, `Next Month ›`), status badges (🟢 Available, 🟡 Reserved, 🟣 Booked), and view mode toggles (`[ 📅 Calendar View ]` | `[ 📋 List View ]`).
+  2. Added date filtering capability where clicking any calendar date cell isolates time slots for that specific day.
+  3. Refactored the public creator profile page booking dialog to use an interactive Date Tabs & Time Slot Pills selector displaying duration, rate USD, and pricing mode badges (`Flat Rate` / `Variable Rate`).
 
 ---
 
-## Day 14 — Observability Verification & End-to-End Testing (FUTURE PHASE - OUTSTANDING)
+## Day 14 — Observability Verification & End-to-End Testing (NEXT ACTIVE PHASE - OUTSTANDING)
 * **Goal**: Audit financial transaction metrics and script end-to-end verification workflows.
 * **Tasks**:
   1. **Expose Business Metrics**: Expose commission balances, payout totals, and pricing model popularity via Prometheus gauges.
