@@ -1,12 +1,12 @@
 # GitOps & Kubernetes Implementation Roadmap
 
-This roadmap details the step-by-step transition from a **local Docker Compose** environment to a production-like, containerized, GitOps-managed **Kubernetes (K3s)** cluster, alongside the implementation of all multi-tenant creator scheduling features, Stripe Connect integrations, and observability systems.
+This roadmap details the step-by-step transition from a **local Docker Compose** environment to a production-like, containerized, GitOps-managed **Kubernetes (K3s)** cluster, alongside the implementation of all multi-tenant creator scheduling features, Stripe Connect integrations, observability systems, and 2026 AI-era DevOps/Platform engineering primitives.
 
 ---
 
 ## Maturity Roadmap Overview
 
-We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12, Day 12-a, and Day 13-a are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Days 14, 15, and 16 are FUTURE PHASES (Outstanding)**.
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12, Day 12-a, and Day 13-a are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Days 14 through 20 are FUTURE PHASES (Outstanding)**.
 
 ```text
                [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
@@ -34,6 +34,18 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                                    │
                                    ▼
                 [ Day 16: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Future Phase - Outstanding)
+                                   │
+                                   ▼
+                [ Day 17: OpenTelemetry Distributed Tracing & Unified APM ] (Future Phase - Outstanding)
+                                   │
+                                   ▼
+                [ Day 18: AI FinOps, Token Cost Tracing & Security Guardrails ] (Future Phase - Outstanding)
+                                   │
+                                   ▼
+                [ Day 19: Model Context Protocol (MCP) Integration Infrastructure ] (Future Phase - Outstanding)
+                                   │
+                                   ▼
+                [ Day 20: K8s AI Workload Hardening & Outcome-Based Analytics ] (Future Phase - Outstanding)
 ```
 
 ---
@@ -164,3 +176,40 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
   1. **Nginx Reverse Proxy & TLS Ingress**: Set up Nginx to terminate TLS and forward requests to internal cluster ingresses.
   2. **API Rate Limiting**: Limit high-frequency API probes on sensitive paths like checkout and authentication routes.
   3. **WAF Security & Telemetry Export**: Deploy OWASP Coraza WAF rules on Nginx, parse blocks to JSON, and collect/forward security alerts to Prometheus & Grafana.
+
+---
+
+## Day 17 — OpenTelemetry Distributed Tracing & Unified APM (FUTURE PHASE - OUTSTANDING)
+* **Goal**: Trace complete end-to-end user transactions across Next.js API endpoints, Stripe Webhooks, database queries, and async jobs.
+* **Tasks**:
+  1. **OpenTelemetry Node SDK Setup**: Integrate `@opentelemetry/sdk-node` into Next.js `instrumentation.ts`.
+  2. **Journey Span Instrumentation**: Trace end-to-end requests: Creator Onboarding → Availability Setup → Booking Checkout → Stripe Webhooks → Connected Account Payout Transfer.
+  3. **Jaeger / Tempo Integration**: Export traces to Jaeger / Grafana Tempo and set up P95 latency alerts on payment flows.
+
+---
+
+## Day 18 — AI FinOps, Token Cost Tracing & Security Guardrails (FUTURE PHASE - OUTSTANDING)
+* **Goal**: Track token-level costs, monitor LLM API latency, enforce prompt security guardrails, and auto-summarize incidents.
+* **Tasks**:
+  1. **Token Cost Attribution Telemetry**: Instrument AI requests with Prometheus metrics (`timeguild_llm_tokens_total`, `timeguild_llm_cost_cents_total`) tagged by tenant, model, and endpoint.
+  2. **AI FinOps Grafana Dashboard**: Build visual panels comparing AI operational costs against platform revenue.
+  3. **AI Security Guardrails Middleware**: Add prompt injection detection, input validation, and PII filtering for AI agent endpoints.
+  4. **AI SRE Incident Summarization Agent**: Deploy an automated agent hook to summarize Loki error logs into incident summaries.
+
+---
+
+## Day 19 — Model Context Protocol (MCP) Integration Infrastructure (FUTURE PHASE - OUTSTANDING)
+* **Goal**: Adopt Model Context Protocol (MCP) to allow platform AI agents to securely connect to external tools and data sources.
+* **Tasks**:
+  1. **MCP Server Integration**: Authored `src/lib/mcp/server.ts` exposing Time Guild primitives (bookings, slots, creator profiles, metrics) as standard MCP tools.
+  2. **MCP Client Agent Integration**: Equip internal agents with an MCP client interface to securely pull external context (calendars, GitHub, web data).
+  3. **Granular Permissions & Tool Auth**: Implement RBAC and token isolation for external tool invocation.
+
+---
+
+## Day 20 — K8s AI Workload Hardening & Outcome-Based Analytics (FUTURE PHASE - OUTSTANDING)
+* **Goal**: Harden Kubernetes for AI/inference workloads and establish outcome-based pricing analytics.
+* **Tasks**:
+  1. **Pod Resource Limits & PodDisruptionBudgets**: Configure explicit memory/CPU limits and PodDisruptionBudgets across tenant namespaces.
+  2. **KEDA / HPA Queue Autoscaling**: Deploy KEDA or HPA rules for autoscaling tenant workloads based on queue depth and request concurrency.
+  3. **Outcome-Based Metrics**: Expose Prometheus gauges for booking success rates, agent intervention value, and automated time saved.
