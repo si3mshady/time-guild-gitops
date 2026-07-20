@@ -1,4 +1,4 @@
-# GitOps & Kubernetes 14-Day Implementation Roadmap
+# GitOps & Kubernetes Implementation Roadmap
 
 This roadmap details the step-by-step transition from a **local Docker Compose** environment to a production-like, containerized, GitOps-managed **Kubernetes (K3s)** cluster, alongside the implementation of all multi-tenant creator scheduling features, Stripe Connect integrations, and observability systems.
 
@@ -6,7 +6,7 @@ This roadmap details the step-by-step transition from a **local Docker Compose**
 
 ## Maturity Roadmap Overview
 
-We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12 are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Day 14 is the FUTURE PHASE (Outstanding)**.
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 12, Day 12-a, and Day 13-a are fully COMPLETED**, **Day 13 is the CURRENT ACTIVE DAY (Outstanding)**, and **Days 14, 15, and 16 are FUTURE PHASES (Outstanding)**.
 
 ```text
                [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
@@ -18,16 +18,22 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                [ Day 9 - Day 12: Business Engine, Payouts, & Slot Budgets ] (Completed)
                                    │
                                    ▼
-                [ Day 13: Interactive Calendars & Visual Schedule ] (Current Active Day)
+               [ Day 12-a: Flexible Scheduling, Pricing Templates, & Lifecycle ] (Completed)
                                    │
                                    ▼
-                [ Day 14: E2E Validation & Business KPIs ] (Future Phase)
+               [ Day 13-a: Test Suite Alignment, Telemetry & DB Integrity ] (Completed)
                                    │
                                    ▼
-                [ Day 15: Testing Framework Restoration & E2E Validation ] (Future Phase)
+                [ Day 13: Interactive Calendars & Visual Schedule ] (Current Active Day - Outstanding)
                                    │
                                    ▼
-                [ Day 16: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Future Phase)
+                [ Day 14: Observability Verification & End-to-End Testing ] (Future Phase - Outstanding)
+                                   │
+                                   ▼
+                [ Day 15: Testing Framework Restoration & E2E Validation ] (Future Phase - Outstanding)
+                                   │
+                                   ▼
+                [ Day 16: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Future Phase - Outstanding)
 ```
 
 ---
@@ -107,9 +113,25 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
   2. Grouped availability slots into daily grids.
   3. Enforced timezone-safe weekly availability budgets (max slots).
 
+## Day 12-a — Flexible Scheduling, Pricing Templates, & Lifecycle Refactoring (COMPLETED)
+* **Goal**: Separate static session templates from dynamic recurring availability windows and track explicit state transitions.
+* **Tasks Completed**:
+  1. Authored `availability_windows` SQLite table supporting recurring weekly blocks and date overrides.
+  2. Implemented `syncSlotsFromAvailability` engine in `src/lib/availability.ts` to dynamically seed 30-day chronological slots.
+  3. Upgraded booking state machine with explicit lifecycle transitions (`draft` → `pending_payment` → `confirmed` → `in_progress` → `completed` → `canceled` / `refunded`).
+  4. Emitted structured `[OBSERVABILITY]` logs for all critical booking and payout events.
+
+## Day 13-a — Test Suite Alignment, Telemetry Integration, & Database Migration Integrity (COMPLETED)
+* **Goal**: Align metrics endpoints, database pragmas, and CI pipelines with refactored lifecycle states.
+* **Tasks Completed**:
+  1. Expanded Prometheus `/api/metrics` exporter to aggregate counts and revenue for all new status states.
+  2. Wrapped database schema transactions in `PRAGMA foreign_keys = OFF / ON` in `db.ts` to prevent constraint corruption.
+  3. Overhauled `/api/admin/reset` nuke route to drop and cleanly rebuild all tables and seed data.
+  4. Optimized `.github/workflows/docker-publish.yml` to remove stale Vitest runners until Day 15 restoration.
+
 ---
 
-## Day 13 — Calendar UX & Scheduling Enhancements (CURRENT ACTIVE - OUTSTANDING)
+## Day 13 — Calendar UX & Scheduling Enhancements (CURRENT ACTIVE DAY - OUTSTANDING)
 * **Goal**: Replace flat form availability lists with calendar-based interfaces.
 * **Tasks**:
   1. **Visual Planner Calendar**: Implement a monthly/weekly calendar grid on the creator dashboard showing available, booked, and reserved slot states.
