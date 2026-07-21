@@ -1,0 +1,8 @@
+# Gitleaks Configuration & Allowlist Rules
+[allowlist]
+description = "Ignore local development SSL certificates and keys"
+paths = [
+  '''infra/docker/nginx/certs/''',
+  '''\.key$''',
+  '''\.crt$'''
+]
