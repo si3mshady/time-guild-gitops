@@ -1,0 +1,151 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: timeguild-nginx-config
+  namespace: timeguild-staging
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /tmp/nginx.pid;
+
+    events {
+        worker_connections 1024;
+    }
+
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+
+        log_format json_analytics escape=json
+          '{"time_local":"$time_local",'
+          '"remote_addr":"$remote_addr",'
+          '"request_method":"$request_method",'
+          '"request_uri":"$request_uri",'
+          '"status":$status,'
+          '"body_bytes_sent":$body_bytes_sent,'
+          '"request_time":$request_time,'
+          '"http_referrer":"$http_referer",'
+          '"http_user_agent":"$http_user_agent",'
+          '"ssl_protocol":"$ssl_protocol",'
+          '"ssl_cipher":"$ssl_cipher",'
+          '"waf_blocked":"$waf_blocked",'
+          '"waf_rule":"$waf_rule",'
+          '"rate_limit_blocked":"$rate_limit_blocked"}';
+
+        access_log /dev/stdout json_analytics;
+        error_log /dev/stderr warn;
+
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+
+        include /etc/nginx/conf.d/*.conf;
+    }
+
+  rate-limiting.conf: |
+    limit_req_zone $binary_remote_addr zone=auth_limit_zone:10m rate=5r/s;
+    limit_req_zone $binary_remote_addr zone=checkout_limit_zone:10m rate=10r/s;
+    limit_req_zone $binary_remote_addr zone=api_limit_zone:10m rate=30r/s;
+    limit_req_status 429;
+
+  waf-rules.conf: |
+    map $query_string $sqli_attack {
+        default 0;
+        "~*select\s+.*\s+from" 1;
+        "~*union\s+select" 1;
+        "~*insert\s+into" 1;
+        "~*drop\s+table" 1;
+        "~*exec\s*\(.*" 1;
+    }
+
+    map $query_string $xss_attack {
+        default 0;
+        "~*<script" 1;
+        "~*javascript:" 1;
+        "~*onerror\s*=" 1;
+        "~*onload\s*=" 1;
+    }
+
+    map $request_uri $traversal_attack {
+        default 0;
+        "~*\.\./" 1;
+        "~*\.env$" 1;
+        "~*/proc/self" 1;
+        "~*/etc/passwd" 1;
+    }
+
+    map $http_user_agent $bad_bot {
+        default 0;
+        "~*sqlmap" 1;
+        "~*nikto" 1;
+        "~*dirbuster" 1;
+        "~*nmap" 1;
+    }
+
+    map $status $waf_blocked {
+        default 0;
+        403 1;
+    }
+
+    map $status $rate_limit_blocked {
+        default 0;
+        429 1;
+    }
+
+    map $status $waf_rule {
+        default "none";
+        403 "WAF_SECURITY_FILTER_TRIGGERED";
+        429 "RATE_LIMIT_BURST_BREACH";
+    }
+
+  default.conf: |
+    upstream nextjs_backend {
+        server 127.0.0.1:3000 max_fails=3 fail_timeout=10s;
+        keepalive 32;
+    }
+
+    server {
+        listen 8080 default_server;
+        listen [::]:8080 default_server;
+        server_name _;
+
+        if ($sqli_attack = 1) {
+            return 403;
+        }
+        if ($xss_attack = 1) {
+            return 403;
+        }
+        if ($traversal_attack = 1) {
+            return 403;
+        }
+        if ($bad_bot = 1) {
+            return 403;
+        }
+
+        location /nginx_status {
+            stub_status on;
+            access_log off;
+            allow all;
+        }
+
+        location /api/auth/ {
+            limit_req zone=auth_limit_zone burst=10 nodelay;
+            proxy_pass http://nextjs_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location / {
+            limit_req zone=api_limit_zone burst=50 nodelay;
+            proxy_pass http://nextjs_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }

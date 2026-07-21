@@ -1,35 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "timeguild.fullname" . }}
+  name: timeguild-prod
+  namespace: timeguild-prod
   labels:
-    {{- include "timeguild.labels" . | nindent 4 }}
+    app.kubernetes.io/instance: timeguild-prod
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: timeguild
+    app.kubernetes.io/version: 1.0.0
     component: server
-  annotations:
-    argocd.argoproj.io/sync-wave: "2"
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: 2
   strategy:
-    type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
+    type: RollingUpdate
   selector:
     matchLabels:
-      {{- include "timeguild.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/instance: timeguild-prod
+      app.kubernetes.io/name: timeguild
       component: server
   template:
     metadata:
       labels:
-        {{- include "timeguild.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/instance: timeguild-prod
+        app.kubernetes.io/name: timeguild
         component: server
     spec:
-      serviceAccountName: {{ .Values.serviceAccount.name | default (include "timeguild.fullname" .) }}
+      serviceAccountName: timeguild-sa
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.persistence.enabled }}
+        fsGroup: 1001
+        runAsGroup: 1001
+        runAsNonRoot: false
+        runAsUser: 1001
       initContainers:
         - name: init-permissions
           image: busybox:1.36
@@ -41,44 +45,38 @@ spec:
           volumeMounts:
             - name: db-storage
               mountPath: /app/data
-      {{- end }}
       containers:
         - name: nextjs
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: si3mshady/time-guild:latest
+          imagePullPolicy: IfNotPresent
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          {{/*
-          MENTORING NOTE (Port Mismatch):
-          Why does containerPort use `.Values.service.port` instead of hardcoded 3000?
-          Our Next.js application receives the PORT environment variable from the ConfigMap, 
-          which resolves to the Service Port (80). Therefore, the Next.js process starts and 
-          listens on port 80.
-          
-          If the containerPort here is hardcoded to 3000, Kubernetes named port "http" maps to 3000. 
-          When startup/liveness/readiness probes check the named port "http" (3000), they fail because 
-          nothing is listening there, resulting in continuous RunContainerError or CrashLoopBackOff restarts.
-          Mapping containerPort to the dynamic service port solves this mismatch.
-          */}}
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 1001
           ports:
             - name: app-http
               containerPort: 3000
               protocol: TCP
+          env:
+            - name: PORT
+              value: "3000"
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           envFrom:
             - configMapRef:
-                name: {{ include "timeguild.fullname" . }}-config
+                name: timeguild-prod-config
             - secretRef:
-                name: {{ include "timeguild.fullname" . }}-env-secrets
-          {{- if .Values.persistence.enabled }}
+                name: timeguild-prod-secrets
           volumeMounts:
             - name: db-storage
-              mountPath: {{ .Values.persistence.mountPath }}
-              {{- if .Values.persistence.subPath }}
-              subPath: {{ .Values.persistence.subPath }}
-              {{- end }}
-          {{- end }}
+              mountPath: /app/data
           startupProbe:
             httpGet:
               path: /
@@ -133,15 +131,7 @@ spec:
           emptyDir: {}
         - name: nginx-config-vol
           configMap:
-            name: {{ include "timeguild.fullname" . }}-nginx-config
-      {{- if .Values.persistence.enabled }}
+            name: timeguild-nginx-config
         - name: db-storage
-          {{- if eq .Values.persistence.type "hostPath" }}
-          hostPath:
-            path: {{ .Values.persistence.hostPath | quote }}
-            type: DirectoryOrCreate
-          {{- else }}
           persistentVolumeClaim:
-            claimName: {{ include "timeguild.fullname" . }}-db-pvc
-          {{- end }}
-      {{- end }}
+            claimName: timeguild-prod-db-pvc
