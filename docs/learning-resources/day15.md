@@ -1,7 +1,7 @@
 # Day 15: Nginx Edge Reverse Proxy, TLS/SSL, Rate Limiting, WAF Security & Telemetry
 
 > [!IMPORTANT]
-> **Status: CURRENT ACTIVE PHASE (In Progress & Verified)**
+> **Status: COMPLETED & VERIFIED (Includes Day 15-a Telemetry & Panel Fixes)**
 > *For a full macro/micro architectural deep-dive, sidecar pattern explanation, TLS certificate flow, and troubleshooting playbook, see [NGINX_GITOPS_OBSERVABILITY_COURSE_GUIDE.md](file:///home/si3mshady/time-guild/docs/learning-resources/NGINX_GITOPS_OBSERVABILITY_COURSE_GUIDE.md).*
 
 ---
@@ -15,7 +15,7 @@ Adding an Nginx edge proxy in front of the Next.js application tier provides an 
 
 ---
 
-## 2. Core Implementation Plan
+## 2. Core Implementation & Observation Mode (Day 15-a Integration)
 
 ### A. Nginx Configuration & JSON Logging (`infra/docker/nginx/nginx.conf`)
 * **JSON Access Log Format**: Configure `log_format json_analytics` to capture IP addresses, HTTP methods, request URIs, response status codes, latency durations, and WAF block flags.
@@ -32,21 +32,49 @@ Adding an Nginx edge proxy in front of the Next.js application tier provides an 
 * **Path Traversal & Probe Shielding**: Reject `../`, `.env`, `wp-admin`, and unauthorized hidden file probes.
 * **User-Agent Filtering**: Block known malicious scanners (sqlmap, nikto, dirbuster).
 
-### D. Docker & Helm Manifest Integration
-* Create `infra/docker/nginx/Dockerfile` packaging Nginx with custom configuration files and WAF rules.
-* Integrate Nginx service container in `infra/compose/docker-compose.yml` and Kubernetes Helm chart manifests.
-
-### E. Promtail Telemetry Parsing & Grafana Security Dashboard
-* Configure Promtail pipeline in `infra/logging/promtail-config.yaml` to extract:
-  - `nginx_rate_limit_hits_total`
-  - `nginx_waf_blocks_total`
-  - `nginx_http_requests_total` by status code (`2xx`, `4xx`, `5xx`).
-* Add a dedicated **Edge Security & WAF Telemetry** panel grid to Grafana dashboard.
+### D. Promtail Telemetry Parsing & Grafana Security Dashboard
+* Configure Promtail pipeline in `infra/logging/promtail-config.yaml` to extract container logs tagged with `container="nginx"`.
+* **Panel 201**: *Incoming Nginx HTTPS Requests/Sec* (`sum(rate({container="nginx"}[1m]))`, `type: stat`, `graphMode: area`).
+* **Panel 202**: *WAF Security Probes Blocked (403 Forbidden)* (`sum(count_over_time({container="nginx"} |= "\"status\":403" [1h]))`).
+* **Panel 203**: *Rate Limit Hits (429 Too Many Requests)* (`sum(count_over_time({container="nginx"} |= "\"status\":429" [1h]))`).
+* **Panel 204**: *Live Nginx Edge JSON Access & Security Logs Stream* (`{container="nginx"} | json`).
 
 ---
 
-## 3. Verification & Testing Steps
-1. Verify Nginx container builds and starts cleanly.
+## 3. Deep-Dive Case Study: Resolving the Grafana Vector Label Collision
+
+During Day 15-a, we encountered a persistent Grafana panel error:
+> `execution vector cannot contain metrics with the same labelset` (indicated by a red square / exclamation triangle on Panel 201).
+
+### Root Cause Analysis
+1. **Plugin Type Mismatch**: Panel 201 was created as a Grafana `timeseries` panel (`"type": "timeseries"`). When querying Loki for a range vector without stripping all stream labels (`stream="stdout"`, `stream="stderr"`), Loki returned multiple matrix streams. Grafana's `timeseries` plugin failed to collapse the matrix streams into a single timeseries vector, throwing the label collision error.
+2. **The Resolution**: Converted Panel 201 to `"type": "stat"` with `"graphMode": "area"` and `"queryType": "range"`, matching the proven configuration of Panels 202 and 203.
+
+```json
+{
+  "id": 201,
+  "title": "Incoming Nginx HTTPS Requests/Sec",
+  "type": "stat",
+  "options": {
+    "colorMode": "value",
+    "graphMode": "area",
+    "justifyMode": "auto"
+  },
+  "targets": [
+    {
+      "datasource": { "type": "loki", "uid": "Loki" },
+      "expr": "sum(rate({container=\"nginx\"}[1m]))",
+      "legendFormat": "Requests/sec",
+      "queryType": "range"
+    }
+  ]
+}
+```
+
+---
+
+## 4. Verification & Testing Steps
+1. Verify Nginx container builds and starts cleanly in Pod sandbox.
 2. Test rate-limiting response (`HTTP 429 Too Many Requests`) by sending rapid bursts to `/api/auth/signin`.
 3. Test WAF security blocks (`HTTP 403 Forbidden`) using mock injection probes (`curl "/api/creators?id=1%20UNION%20SELECT"`).
-4. Verify JSON access logs in Loki and validate Prometheus security metrics.
+4. Verify live JSON access logs in Loki and confirm all Grafana Edge Telemetry panels display cleanly without any red exclamation triangles.

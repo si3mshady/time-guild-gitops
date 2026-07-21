@@ -67,6 +67,10 @@ During the deployment of the Nginx sidecar architecture on Day 15, we encountere
 * **Root Cause**: The Grafana dashboard panel LogQL query was hardcoded to `{app=~".*nginx.*"} | json`. Promtail automatically attaches standard labels `namespace`, `pod`, and `container` to log streams. Because the container name was `nginx`, `{app=...}` matched zero Loki streams.
 * **Resolution**: Updated the LogQL panel expression to `{container="nginx"} | json`, instantly rendering live JSON access and security logs in Grafana.
 
+### Issue 5: Grafana Vector Labelset Collision & Timeseries Plugin Mismatch
+* **Root Cause**: Panel 201 (*Incoming Nginx HTTPS Requests/Sec*) was defined as `"type": "timeseries"`. When Loki evaluated `sum(rate({container="nginx"}[1m]))` across multiple pod log streams, Loki returned a matrix vector containing stream labels (`stream="stdout"`, `stream="stderr"`). Grafana's `timeseries` plugin failed to collapse the matrix streams into a single timeseries vector, rendering a red triangle exclamation icon with error `execution vector cannot contain metrics with the same labelset`.
+* **Resolution**: Converted Panel 201 to `"type": "stat"` with `"graphMode": "area"` and `"queryType": "range"`. Using scalar aggregation `sum(rate({container="nginx"}[1m]))` strips matrix stream labels, rendering the big live request rate numerical value alongside a smooth background sparkline graph over time with zero errors.
+
 ---
 
 ## 3. The Kubernetes Sidecar Pattern (Micro vs. Macro)
