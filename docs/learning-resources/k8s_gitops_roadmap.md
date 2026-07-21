@@ -6,7 +6,7 @@ This roadmap details the step-by-step transition from a **local Docker Compose**
 
 ## Maturity Roadmap Overview
 
-We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 14 are fully COMPLETED**, **Day 15 is PAUSED**, and **Days 16 through 20 are FUTURE PHASES**.
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 14 are fully COMPLETED**, **Day 15 is the NEXT ACTIVE PHASE (In Progress)**, and **Days 16 through 20 are FUTURE PHASES**.
 
 ```text
                [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
@@ -36,22 +36,19 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                 [ Day 14: Observability Verification & End-to-End Testing ] (Completed)
                                    │
                                    ▼
-                 [ Day 15: Testing Framework Restoration & E2E Validation ] (PAUSED / ON HOLD)
+                 [ Day 15: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Next Active Phase - In Progress)
                                    │
                                    ▼
-                [ Day 16: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Future Phase - Outstanding)
+                 [ Day 16: OpenTelemetry Distributed Tracing & Unified APM ] (Future Phase - Outstanding)
                                    │
                                    ▼
-                [ Day 17: OpenTelemetry Distributed Tracing & Unified APM ] (Future Phase - Outstanding)
+                 [ Day 17: AI FinOps, Token Cost Tracing & Security Guardrails ] (Future Phase - Outstanding)
                                    │
                                    ▼
-                [ Day 18: AI FinOps, Token Cost Tracing & Security Guardrails ] (Future Phase - Outstanding)
+                 [ Day 18: Model Context Protocol (MCP) Integration Infrastructure ] (Future Phase - Outstanding)
                                    │
                                    ▼
-                [ Day 19: Model Context Protocol (MCP) Integration Infrastructure ] (Future Phase - Outstanding)
-                                   │
-                                   ▼
-                [ Day 20: K8s AI Workload Hardening & Outcome-Based Analytics ] (Future Phase - Outstanding)
+                 [ Day 19: K8s AI Workload Hardening & Outcome-Based Analytics ] (Future Phase - Outstanding)
 ```
 
 ---
