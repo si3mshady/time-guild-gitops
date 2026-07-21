@@ -350,7 +350,7 @@ data:
                 "uid": "Prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(nginx_requests_total[1m])) by (status) || vector(0)",
+              "expr": "sum(rate(nginx_requests_total[1m])) by (status) or vector(0)",
               "legendFormat": "HTTP {{status}}",
               "range": true,
               "refId": "A"
@@ -416,7 +416,7 @@ data:
                 "uid": "Prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(nginx_waf_blocks_total) || vector(0)",
+              "expr": "sum(nginx_waf_blocks_total) or vector(0)",
               "legendFormat": "WAF Blocks",
               "range": true,
               "refId": "A"
@@ -482,7 +482,7 @@ data:
                 "uid": "Prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(nginx_rate_limit_blocks_total) || vector(0)",
+              "expr": "sum(nginx_rate_limit_blocks_total) or vector(0)",
               "legendFormat": "Rate Limit Hits",
               "range": true,
               "refId": "A"
