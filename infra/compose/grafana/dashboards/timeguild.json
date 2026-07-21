@@ -65,7 +65,7 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
+        "w": 5,
         "x": 0,
         "y": 1
       },
@@ -92,7 +92,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(timeguild_bookings_total)",
+          "expr": "sum(timeguild_bookings_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})",
           "legendFormat": "Bookings",
           "range": true,
           "refId": "A"
@@ -127,8 +127,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 6,
+        "w": 5,
+        "x": 5,
         "y": 1
       },
       "id": 3,
@@ -154,13 +154,13 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(timeguild_booking_revenue_dollars_total)",
+          "expr": "sum(timeguild_booking_revenue_dollars_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})",
           "legendFormat": "Revenue",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Total Escrow Revenue",
+      "title": "Total Holding Revenue",
       "type": "stat"
     },
     {
@@ -189,8 +189,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 12,
+        "w": 5,
+        "x": 10,
         "y": 1
       },
       "id": 4,
@@ -216,7 +216,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "timeguild_stripe_transfers_completed_total",
+          "expr": "sum(timeguild_stripe_transfers_completed_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})",
           "legendFormat": "Transfers",
           "range": true,
           "refId": "A"
@@ -240,7 +240,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "purple",
+                "color": "red",
                 "value": null
               }
             ]
@@ -251,11 +251,11 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 18,
+        "w": 4,
+        "x": 15,
         "y": 1
       },
-      "id": 5,
+      "id": 101,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -278,13 +278,13 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "timeguild_bullmq_queue_depth",
-          "legendFormat": "Queue Depth",
+          "expr": "sum(timeguild_stripe_holding_refunds_total{namespace=~\"$namespace\",tenant=~\"$tenant\"})",
+          "legendFormat": "Refunds",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Active BullMQ Queue Depth",
+      "title": "Stripe Refunds / Cancellations",
       "type": "stat"
     },
     {
@@ -295,8 +295,8 @@
         "x": 0,
         "y": 5
       },
-      "id": 6,
-      "title": "Availability & System Latencies",
+      "id": 200,
+      "title": "Nginx Edge Ingress & WAF Security Telemetry",
       "type": "row"
     },
     {
@@ -310,13 +310,16 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "req/sec",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2
           },
-          "mappings": []
+          "unit": "reqps"
         },
         "overrides": []
       },
@@ -326,30 +329,17 @@
         "x": 0,
         "y": 6
       },
-      "id": 7,
+      "id": 201,
       "options": {
-        "displayLabels": [
-          "percent",
-          "value"
-        ],
         "legend": {
           "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "pieType": "donut",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+          "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single",
-          "sort": "none"
+          "mode": "multi"
         }
       },
+      "pluginVersion": "9.5.2",
       "targets": [
         {
           "datasource": {
@@ -357,14 +347,14 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "timeguild_slots_total",
-          "legendFormat": "{{status}} slots",
+          "expr": "sum(rate(nginx_requests_total[1m])) by (status) || vector(0)",
+          "legendFormat": "HTTP {{status}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Consulting Slot Availability Status",
-      "type": "piechart"
+      "title": "Incoming Nginx HTTPS Requests/Sec",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -374,38 +364,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -414,32 +373,39 @@
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
               }
             ]
           },
-          "unit": "s"
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 6,
-        "w": 16,
+        "w": 8,
         "x": 8,
         "y": 6
       },
-      "id": 8,
+      "id": 202,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "textMode": "auto"
       },
+      "pluginVersion": "9.5.2",
       "targets": [
         {
           "datasource": {
@@ -447,37 +413,80 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "timeguild_http_request_duration_seconds_p95",
-          "legendFormat": "HTTP Request Latency (P95)",
+          "expr": "sum(nginx_waf_blocks_total) || vector(0)",
+          "legendFormat": "WAF Blocks",
           "range": true,
           "refId": "A"
+        }
+      ],
+      "title": "WAF Security Probes Blocked (403 Forbidden)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
         },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 6
+      },
+      "id": 203,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "timeguild_db_query_duration_seconds",
-          "legendFormat": "Avg SQL Query Latency",
+          "expr": "sum(nginx_rate_limit_blocks_total) || vector(0)",
+          "legendFormat": "Rate Limit Hits",
           "range": true,
-          "refId": "B"
+          "refId": "A"
         }
       ],
-      "title": "System Latencies (HTTP & Database)",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 12
-      },
-      "id": 9,
-      "title": "Application Log Streams (Loki)",
-      "type": "row"
+      "title": "Rate Limit Hits (429 Too Many Requests)",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -488,14 +497,14 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 12
       },
-      "id": 10,
+      "id": 204,
       "options": {
         "enableLogDetails": true,
-        "prettifyLogMessage": false,
+        "prettifyLogMessage": true,
         "showCommonLabels": false,
-        "showLabels": false,
+        "showLabels": true,
         "showTime": true,
         "sortOrder": "Descending",
         "wrapLogMessage": true
@@ -507,12 +516,12 @@
             "uid": "Loki"
           },
           "editorMode": "code",
-          "expr": "{app=~\"timeguild-app-dev.*\"}",
+          "expr": "{app=~\".*nginx.*\"} | json",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Real-time Container Logs",
+      "title": "Live Nginx Edge JSON Access & Security Logs Stream",
       "type": "logs"
     }
   ],
@@ -520,7 +529,52 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "Prometheus"
+        },
+        "definition": "label_values(timeguild_users_total, namespace)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": false,
+        "name": "namespace",
+        "options": [],
+        "query": {
+          "query": "label_values(timeguild_users_total, namespace)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "Prometheus"
+        },
+        "definition": "label_values(timeguild_users_total{namespace=~\"$namespace\"}, tenant)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": false,
+        "name": "tenant",
+        "options": [],
+        "query": {
+          "query": "label_values(timeguild_users_total{namespace=~\"$namespace\"}, tenant)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-1h",
