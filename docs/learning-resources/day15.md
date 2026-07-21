@@ -1,7 +1,8 @@
 # Day 15: Codebase Testing Framework Restoration & E2E Validation
 
-> [!WARNING]
-> **Status: OUTSTANDING (Future Phase)**
+> [!CAUTION]
+> **Status: PAUSED / ON HOLD**
+> *Automated test suite execution and testing framework restoration are explicitly paused for the time being.*
 
 ---
 
