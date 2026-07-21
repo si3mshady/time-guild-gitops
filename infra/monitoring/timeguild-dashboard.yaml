@@ -346,12 +346,12 @@ data:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "Prometheus"
+                "type": "loki",
+                "uid": "Loki"
               },
               "editorMode": "code",
-              "expr": "sum(rate(nginx_requests_total[1m])) by (status) or vector(0)",
-              "legendFormat": "HTTP {{status}}",
+              "expr": "sum(rate({container=\"nginx\"} [1m]))",
+              "legendFormat": "Requests/sec",
               "range": true,
               "refId": "A"
             }
@@ -361,8 +361,8 @@ data:
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus"
+            "type": "loki",
+            "uid": "Loki"
           },
           "fieldConfig": {
             "defaults": {
@@ -412,11 +412,11 @@ data:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "Prometheus"
+                "type": "loki",
+                "uid": "Loki"
               },
               "editorMode": "code",
-              "expr": "sum(nginx_waf_blocks_total) or vector(0)",
+              "expr": "sum(count_over_time({container=\"nginx\"} |= \"\\\"status\\\":403\" [1h]))",
               "legendFormat": "WAF Blocks",
               "range": true,
               "refId": "A"
@@ -427,8 +427,8 @@ data:
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus"
+            "type": "loki",
+            "uid": "Loki"
           },
           "fieldConfig": {
             "defaults": {
@@ -478,11 +478,11 @@ data:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "Prometheus"
+                "type": "loki",
+                "uid": "Loki"
               },
               "editorMode": "code",
-              "expr": "sum(nginx_rate_limit_blocks_total) or vector(0)",
+              "expr": "sum(count_over_time({container=\"nginx\"} |= \"\\\"status\\\":429\" [1h]))",
               "legendFormat": "Rate Limit Hits",
               "range": true,
               "refId": "A"
