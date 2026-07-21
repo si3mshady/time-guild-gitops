@@ -350,7 +350,7 @@ data:
                 "uid": "Loki"
               },
               "editorMode": "code",
-              "expr": "sum(rate({container=\"nginx\"} [1m]))",
+              "expr": "sum(rate({container=\"nginx\"} [1m])) by (container)",
               "legendFormat": "Requests/sec",
               "range": true,
               "refId": "A"
@@ -416,7 +416,7 @@ data:
                 "uid": "Loki"
               },
               "editorMode": "code",
-              "expr": "sum(count_over_time({container=\"nginx\"} |= \"\\\"status\\\":403\" [1h]))",
+              "expr": "sum(count_over_time({container=\"nginx\"} |= \"\\\"status\\\":403\" [1h])) by (container)",
               "legendFormat": "WAF Blocks",
               "range": true,
               "refId": "A"
@@ -482,7 +482,7 @@ data:
                 "uid": "Loki"
               },
               "editorMode": "code",
-              "expr": "sum(count_over_time({container=\"nginx\"} |= \"\\\"status\\\":429\" [1h]))",
+              "expr": "sum(count_over_time({container=\"nginx\"} |= \"\\\"status\\\":429\" [1h])) by (container)",
               "legendFormat": "Rate Limit Hits",
               "range": true,
               "refId": "A"
