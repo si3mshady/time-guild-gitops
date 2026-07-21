@@ -12,7 +12,7 @@ spec:
   ports:
     - name: http
       port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.port }}
+      targetPort: 8080
       protocol: TCP
   selector:
     {{- include "timeguild.selectorLabels" . | nindent 4 }}

@@ -7,7 +7,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 data:
-  PORT: {{ .Values.service.port | quote }}
+  PORT: "3000"
   HOSTNAME: "0.0.0.0"
   NEXT_PUBLIC_STRIPE_TEST_MODE: {{ .Values.config.NEXT_PUBLIC_STRIPE_TEST_MODE | quote }}
   SUPABASE_PROJECT_ID: {{ .Values.config.SUPABASE_PROJECT_ID | quote }}
