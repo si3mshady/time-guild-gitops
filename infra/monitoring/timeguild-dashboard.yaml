@@ -519,7 +519,7 @@ data:
                 "uid": "Loki"
               },
               "editorMode": "code",
-              "expr": "{app=~\".*nginx.*\"} | json",
+              "expr": "{container=\"nginx\"} | json",
               "queryType": "range",
               "refId": "A"
             }

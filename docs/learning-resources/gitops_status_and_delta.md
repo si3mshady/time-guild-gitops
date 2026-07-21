@@ -28,12 +28,12 @@ The Time Guild application and deployment infrastructure are highly mature, havi
 | **Day 13-c** | LangGraph Supervisor Multi-Agent System | **COMPLETED** | Supervisor Router Agent (`/api/agent/supervisor`), sub-agents (Provider Setup, Client Booking, Lifecycle Support), domain tools layer (`provider-tools`, `client-tools`, `lifecycle-tools`). |
 | **Day 13** | Visual Calendar & Scheduling | **COMPLETED** | Interactive monthly/weekly visual calendar grid on dashboard, month navigation controls, date tabs & time slot pills picker on creator profile page. |
 | **Day 14** | E2E Testing & Business Metrics | **COMPLETED** | Financial metrics in `/api/metrics`, Grafana financial panels, E2E CLI simulation script (`test-e2e-bookings.sh`). |
-| **Day 15** | Testing Framework Restoration | **PAUSED / ON HOLD** | State machine audit, Vitest unit & integration test rebuilds (currently on hold per project directive). |
-| **Day 16** | Nginx Edge Proxy & WAF | **FUTURE PHASE (OUTSTANDING)** | Nginx reverse proxy, rate-limiting zones, OWASP Coraza WAF rules, Promtail JSON telemetry export. |
-| **Day 17** | Distributed Tracing & Unified APM | **FUTURE PHASE (OUTSTANDING)** | OpenTelemetry tracing across API/webhooks, Jaeger trace integration, booking journey SLO alerts. |
-| **Day 18** | AI FinOps, Tracing & Guardrails | **FUTURE PHASE (OUTSTANDING)** | Token-level cost attribution, LLM latency metrics, AI guardrails (prompt injection/PII), incident summary agent. |
-| **Day 19** | Model Context Protocol (MCP) | **FUTURE PHASE (OUTSTANDING)** | MCP server/client integration for AI agents, external tool connectors (calendars, GitHub, web data). |
-| **Day 20** | K8s AI Hardening & Outcome Pricing | **FUTURE PHASE (OUTSTANDING)** | Pod resource limits/HPA, queue autoscaling, model inference metrics, outcome-based pricing analytics. |
+| **Day 15** | Nginx Edge Proxy, SSL & WAF | **CURRENT ACTIVE PHASE (In Progress)** | Nginx sidecar, rate-limiting rules, WAF security filters, Promtail JSON telemetry export, Grafana security dashboard. |
+| **Day 16** | Distributed Tracing & APM | **FUTURE PHASE (OUTSTANDING)** | OpenTelemetry tracing across API/webhooks, Jaeger trace integration, booking journey SLO alerts. |
+| **Day 17** | AI FinOps, Tracing & Guardrails | **FUTURE PHASE (OUTSTANDING)** | Token-level cost attribution, LLM latency metrics, AI guardrails (prompt injection/PII), incident summary agent. |
+| **Day 18** | Model Context Protocol (MCP) | **FUTURE PHASE (OUTSTANDING)** | MCP server/client integration for AI agents, external tool connectors (calendars, GitHub, web data). |
+| **Day 19** | K8s AI Hardening & Analytics | **FUTURE PHASE (OUTSTANDING)** | Pod resource limits/HPA, queue autoscaling, model inference metrics, outcome-based pricing analytics. |
+| **Day 20** | Final Production Hardening | **FUTURE PHASE (OUTSTANDING)** | Production scale validation, disaster recovery playbooks, final end-to-end security audits. |
 
 ---
 

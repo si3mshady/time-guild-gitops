@@ -27,6 +27,10 @@ spec:
           Aligning the allowed ingress port with the service port resolves this block.
           */}}
           port: {{ .Values.service.port }}
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 3000
   egress:
     - to:
         - namespaceSelector: {}

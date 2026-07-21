@@ -1,8 +1,8 @@
 # Day 15: Nginx Edge Reverse Proxy, TLS/SSL, Rate Limiting, WAF Security & Telemetry
 
 > [!IMPORTANT]
-> **Status: CURRENT ACTIVE PHASE (In Progress)**
-> *Note: Replaced legacy testing restoration phase with Nginx Edge Proxy, SSL termination, structured logging, rate limiting, and WAF security telemetry.*
+> **Status: CURRENT ACTIVE PHASE (In Progress & Verified)**
+> *For a full macro/micro architectural deep-dive, sidecar pattern explanation, TLS certificate flow, and troubleshooting playbook, see [NGINX_GITOPS_OBSERVABILITY_COURSE_GUIDE.md](file:///home/si3mshady/time-guild/docs/learning-resources/NGINX_GITOPS_OBSERVABILITY_COURSE_GUIDE.md).*
 
 ---
 
