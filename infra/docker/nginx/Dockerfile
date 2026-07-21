@@ -15,7 +15,7 @@ RUN apk add --no-co-cache openssl && \
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout /etc/nginx/certs/timeguild.key \
     -out /etc/nginx/certs/timeguild.crt \
-    -subj "/C=US/ST=State/L=City/O=TimeGuild/CN=*.timeguild.local"
+    -subj "/C=US/ST=State/L=City/O=TimeGuild/CN=*.timeguild.xyz"
 
 EXPOSE 80 443
 

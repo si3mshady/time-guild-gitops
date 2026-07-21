@@ -1,9 +1,9 @@
 replicaCount: 2
 
 image:
-  repository: si3mshady/time-guild
+  repository: ghcr.io/si3mshady/time-guild
   pullPolicy: IfNotPresent
-  tag: "sha-f80c9db"
+  tag: "sha-64035f4"
 
 serviceAccount:
   create: true
@@ -34,19 +34,19 @@ ingress:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
-    - host: timeguild.local
+    - host: timeguild.xyz
       paths:
         - path: /
           pathType: Prefix
-    - host: "*.timeguild.local"
+    - host: "*.timeguild.xyz"
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: timeguild-tls-secret
       hosts:
-        - timeguild.local
-        - "*.timeguild.local"
+        - timeguild.xyz
+        - "*.timeguild.xyz"
 
 resources:
   requests:

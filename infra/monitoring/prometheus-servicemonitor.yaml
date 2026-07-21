@@ -2,15 +2,14 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: timeguild-monitor
-  namespace: timeguild-monitoring
+  namespace: timeguild-prod
   labels:
-    release: prometheus-stack
+    release: prometheus-kube-stack
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: timeguild
-  namespaceSelector:
-    any: true
+      app: timeguild
+      component: server
   endpoints:
     - port: http
       path: /api/metrics # Endpoint exposing OpenTelemetry/Prometheus metrics in Next.js

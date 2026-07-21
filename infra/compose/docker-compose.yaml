@@ -1,4 +1,24 @@
 services:
+  # Nginx Edge Proxy & WAF Security Layer
+  nginx:
+    build:
+      context: ../../
+      dockerfile: infra/docker/nginx/Dockerfile
+    container_name: timeguild-nginx-dev
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - timeguild-net
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/nginx_status"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   # Next.js / Bun Core Marketplace Application
   app:
     build:
