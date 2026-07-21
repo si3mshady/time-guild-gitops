@@ -1,9 +1,9 @@
 replicaCount: 2
 
 image:
-  repository: ghcr.io/si3mshady/time-guild
+  repository: si3mshady/time-guild
   pullPolicy: IfNotPresent
-  tag: "sha-f07e463"
+  tag: "sha-15c0a05"
 
 serviceAccount:
   create: true
