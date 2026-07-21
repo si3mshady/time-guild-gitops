@@ -42,6 +42,62 @@ data:
         tcp_nodelay on;
         keepalive_timeout 65;
 
+        # 1. SQL Injection (SQLi) Protection Filter Map
+        map $request_uri $sqli_attack {
+            default 0;
+            "~*select.*from" 1;
+            "~*union.*select" 1;
+            "~*insert.*into" 1;
+            "~*delete.*from" 1;
+            "~*drop.*table" 1;
+            "~*information_schema" 1;
+            "~*exec(\s|\+)+(s|x)p" 1;
+            "~*or\s+1=1" 1;
+            "~*benchmark\(" 1;
+            "~*sleep\(" 1;
+        }
+
+        # 2. Cross-Site Scripting (XSS) Protection Filter Map
+        map $request_uri $xss_attack {
+            default 0;
+            "~*<script" 1;
+            "~*javascript:" 1;
+            "~*onload=" 1;
+            "~*onerror=" 1;
+            "~*eval\(" 1;
+            "~*document\.cookie" 1;
+        }
+
+        # 3. Path Traversal & Probe Protection Filter Map
+        map $request_uri $traversal_attack {
+            default 0;
+            "~*\.\./" 1;
+            "~*\.env" 1;
+            "~*wp-config" 1;
+            "~*wp-admin" 1;
+            "~*\.git" 1;
+            "~*\.htaccess" 1;
+            "~*/etc/passwd" 1;
+        }
+
+        # 4. Malicious User-Agent / Scanner Filter Map
+        map $http_user_agent $bad_bot {
+            default 0;
+            "~*sqlmap" 1;
+            "~*nikto" 1;
+            "~*dirbuster" 1;
+            "~*nmap" 1;
+            "~*masscan" 1;
+            "~*w3af" 1;
+            "~*acunetix" 1;
+            "~*havij" 1;
+        }
+
+        # Rate Limiting Zones
+        limit_req_zone $binary_remote_addr zone=auth_limit_zone:10m rate=5r/s;
+        limit_req_zone $binary_remote_addr zone=checkout_limit_zone:10m rate=10r/s;
+        limit_req_zone $binary_remote_addr zone=api_limit_zone:10m rate=30r/s;
+
         include /etc/nginx/conf.d/*.conf;
     }
 
@@ -56,10 +112,44 @@ data:
         listen [::]:8080 default_server;
         server_name _;
 
+        # WAF Rule Enforcement
+        if ($sqli_attack = 1) {
+            return 403;
+        }
+        if ($xss_attack = 1) {
+            return 403;
+        }
+        if ($traversal_attack = 1) {
+            return 403;
+        }
+        if ($bad_bot = 1) {
+            return 403;
+        }
+
         location /nginx_status {
             stub_status on;
             access_log off;
             allow all;
+        }
+
+        # Rate-Limited Auth Endpoints
+        location /api/auth/ {
+            limit_req zone=auth_limit_zone burst=5 nodelay;
+            proxy_pass http://nextjs_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Rate-Limited Stripe & Agent Endpoints
+        location ~* ^/api/(stripe|agent)/ {
+            limit_req zone=checkout_limit_zone burst=10 nodelay;
+            proxy_pass http://nextjs_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
         }
 
         location / {
