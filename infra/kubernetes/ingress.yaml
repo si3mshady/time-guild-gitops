@@ -33,5 +33,4 @@ spec:
   tls:
     - hosts:
         - "timeguild.xyz"
-        - "*.timeguild.xyz"
       secretName: timeguild-prod-tls
