@@ -1,4 +1,4 @@
-# Day 19: Model Context Protocol (MCP) Integration Infrastructure
+# Day 19: K8s AI Workload Hardening & Outcome-Based Analytics
 
 > [!WARNING]
 > **Status: OUTSTANDING (Future Phase)**
@@ -6,30 +6,31 @@
 ---
 
 ## 1. Architectural Rationale: Why We Do This
-Model Context Protocol (MCP) provides a open standard for AI agents to discover and interact with tools, resources, and context across platform and third-party boundaries safely.
-* **Standardized Tool Contracts**: Exposing Time Guild primitives (bookings, slots, creator profiles, metrics) as standard MCP tools allows external AI assistants or internal sub-agents to query platform capabilities seamlessly.
-* **Secure Tool Authorization**: Enforcing strict permissions and token context ensures agents operate within tenant boundaries.
+Operating AI workloads and multi-tenant applications in production requires robust Kubernetes cluster management, resource isolation, and business outcome metrics.
+* **Workload Isolation & Reliability**: Enforcing resource limits, horizontal pod autoscaling (HPA/KEDA), and pod disruption budgets ensures high availability under traffic spikes.
+* **Outcome-Based Analytics**: Measuring customer outcome metrics (booking completion rate, automated resolution time, revenue generated per AI interaction) provides actionable platform insight.
 
 ---
 
 ## 2. Core Tasks
 
-### A. MCP Server Integration (`src/lib/mcp/server.ts`)
-* Implement an MCP server exposing Time Guild tools and resources:
-  - `get_creator_availability`: Retrieve open time slots for a given tenant.
-  - `get_platform_metrics`: Expose SRE and financial summary metrics.
-  - `query_booking_status`: Query lifecycle status for client bookings.
+### A. K8s Pod Resource Hardening & Autoscaling
+* Define explicit CPU/Memory request and limit boundaries in `infra/helm` and dynamic K8s provisioner (`src/lib/k8s.ts`).
+* Configure PodDisruptionBudgets and HPA/KEDA scaling rules based on queue depth and HTTP request rates.
 
-### B. MCP Client & Multi-Agent Orchestration
-* Equip internal LangGraph sub-agents with MCP client capability.
-* Enable agents to dynamically discover and consume external tools (e.g., Google Calendar, GitHub releases, web data) during multi-agent workflows.
+### B. AI Workload Metrics
+* Expose gauges for inference request queue depth, API latency percentiles, and LLM retry counts.
 
-### C. Granular RBAC & Context Isolation
-* Enforce tenant-isolated access tokens and scope checks for all MCP tool calls.
-* Log all MCP tool invocations with `[OBSERVABILITY]` events for auditability.
+### C. Outcome-Based Business Analytics
+Expose business outcome metrics on `/api/metrics`:
+* `timeguild_booking_completion_rate`: Ratio of completed paid sessions to total created drafts.
+* `timeguild_agent_resolution_rate`: Percentage of user scheduling workflows resolved autonomously without human escalation.
+* `timeguild_time_saved_seconds_total`: Estimated cumulative administrative time saved for creators.
 
 ---
 
 ## 3. Study & Reference Materials
-* **Model Context Protocol Specification**: Overview of MCP standards, protocol schema, and SDKs:  
-  [https://modelcontextprotocol.io/](https://modelcontextprotocol.io/)
+* **Kubernetes Resource Management & Autoscaling**:  
+  [https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+* **KEDA Kubernetes Event-driven Autoscaling**:  
+  [https://keda.sh/](https://keda.sh/)

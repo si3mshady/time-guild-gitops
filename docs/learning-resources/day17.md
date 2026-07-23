@@ -1,4 +1,4 @@
-# Day 17: Distributed Tracing & Unified APM
+# Day 17: AI FinOps, Token Cost Tracing & Security Guardrails
 
 > [!WARNING]
 > **Status: OUTSTANDING (Future Phase)**
@@ -6,32 +6,38 @@
 ---
 
 ## 1. Architectural Rationale: Why We Do This
-As multi-tenant routing, Stripe webhooks, and multi-agent AI interactions scale, diagnosing end-to-end latency bottlenecks or cross-boundary failures requires distributed tracing across every system boundary.
-* **Unified Request Visibility**: Correlate single user requests as they pass through Next.js API routes, database queries, Stripe payment webhooks, and connected account transfers.
-* **SLO & Error Budget Monitoring**: Measure P95 transaction latencies and pinpoint exact span failures to maintain strict service level objectives.
+Integrating serverless LLM agents (DeepSeek API, LangGraph) into a multi-tenant platform introduces variable operational costs and potential security vectors. 
+* **Token Cost Attribution**: Platform operators must track token usage and cost per tenant, model, and tool invocation to maintain positive margins.
+* **AI Security Guardrails**: Protecting agent endpoints from prompt injections, unexpected tool calls, and PII leakage ensures system safety and trust.
 
 ---
 
 ## 2. Core Tasks
 
-### A. OpenTelemetry Node SDK Setup
-* Configure `@opentelemetry/sdk-node` and `@opentelemetry/auto-instrumentations-node` in Next.js `instrumentation.ts`.
-* Enable trace propagation headers (`traceparent`, `tracestate`) across all internal HTTP calls and API endpoints.
+### A. Token Cost Attribution Telemetry
+Instrument AI agent route handlers (`/api/agent/schedule`, `/api/agent/supervisor`) with Prometheus metrics:
+* `timeguild_llm_tokens_total`: Counter tracking prompt and completion tokens grouped by `{tenant, model, action}`.
+* `timeguild_llm_cost_cents_total`: Calculated cost metric in cents based on model token pricing tiers.
 
-### B. User Journey Span Instrumentation
-Instrument custom spans to track key business transactions:
-* **Creator Onboarding & Provisioning**: Trace tenant registration → K8s namespace creation → DB initialization.
-* **Booking & Payment Journey**: Trace availability lookup → LangGraph agent routing → Stripe Checkout creation → Webhook processing → Express account payout transfer.
+### B. AI FinOps Grafana Dashboard
+Build visual Grafana panels:
+* Real-time LLM cost spend vs platform commission revenue.
+* Token consumption breakdown per tenant and sub-agent (`provider_setup`, `client_booking`, `lifecycle_support`).
 
-### C. Jaeger / Tempo & Grafana APM Integration
-* Export traces via OTLP gRPC/HTTP collectors to Jaeger or Grafana Tempo.
-* Connect trace data with Loki logs and Prometheus metrics in Grafana for unified APM visualization.
-* Configure automated alerts for P95 latency breaches (>500ms) on critical payment endpoints.
+### C. AI Security Guardrails Middleware
+Implement lightweight security layer for LLM inputs and outputs:
+* **Prompt Injection Detection**: Filter malicious user prompts attempting system instruction overrides or unauthorized tool calls.
+* **PII Sanitization & Moderation**: Scrub sensitive client data before forwarding payloads to LLM APIs.
+
+### D. AI SRE Incident Summarization Agent
+Deploy an automated SRE agent hook:
+* Monitor Loki error log bursts.
+* Synthesize error stacks and emit structured incident summaries to administrative channels.
 
 ---
 
 ## 3. Study & Reference Materials
-* **OpenTelemetry Next.js Guide**: Integrating OpenTelemetry tracing in Next.js applications:  
-  [https://nextjs.org/docs/app/building-your-application/optimizing/open-telemetry](https://nextjs.org/docs/app/building-your-application/optimizing/open-telemetry)
-* **Grafana Tempo & Jaeger Tracing**: Best practices for distributed tracing and APM dashboards:  
-  [https://grafana.com/docs/tempo/latest/](https://grafana.com/docs/tempo/latest/)
+* **LangChain / LangGraph Observability**: Tracing agent steps and token consumption:  
+  [https://js.langchain.com/docs/how_to/callbacks_async/](https://js.langchain.com/docs/how_to/callbacks_async/)
+* **OWASP Top 10 for LLM Applications**: Key security risks and mitigation practices for AI systems:  
+  [https://owasp.org/www-project-top-10-for-large-language-model-applications/](https://owasp.org/www-project-top-10-for-large-language-model-applications/)

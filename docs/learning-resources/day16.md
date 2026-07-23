@@ -1,51 +1,37 @@
-# Day 16: Nginx Edge Reverse Proxy, Rate Limiting, & WAF Security Telemetry
+# Day 16: OpenTelemetry Distributed Tracing & Unified APM
 
-> [!WARNING]
-> **Status: OUTSTANDING (Future Phase)**
+> [!IMPORTANT]
+> **Status: OUTSTANDING (Current Active Phase)**
 
 ---
 
 ## 1. Architectural Rationale: Why We Do This
-Adding Nginx as an edge ingress or reverse proxy layer provides an entry point to filter malicious traffic, enforce rate limits on authentication/checkout APIs, and generate structured security logs.
-* **Edge Rate Limiting**: Block denial-of-service attempts and brute-force attacks at the Nginx edge before they consume downstream Next.js CPU cycles.
-* **WAF Security & Blocking**: Filter common web vulnerabilities (SQL injection, XSS, automated path probing) using lightweight security rule engines.
-* **Security Observability**: Turn blocked requests, rate-limit hits, and auth failures into structured JSON logs, forwarding them via Promtail/Loki and exposing counters for Grafana visualization.
+As multi-tenant routing, Stripe webhooks, and multi-agent AI interactions scale, diagnosing end-to-end latency bottlenecks or cross-boundary failures requires distributed tracing across every system boundary.
+* **Unified Request Visibility**: Correlate single user requests as they pass through Next.js API routes, database queries, Stripe payment webhooks, and connected account transfers.
+* **SLO & Error Budget Monitoring**: Measure P95 transaction latencies and pinpoint exact span failures to maintain strict service level objectives.
 
 ---
 
 ## 2. Core Tasks
 
-### A. Deploy Nginx Reverse Proxy with TLS
-* Configure Nginx to route incoming traffic (e.g. `*.timeguild.xyz`) to the Kubernetes Traefik Ingress or Next.js services.
-* Enable TLS termination using certs managed via cert-manager, forwarding downstream protocol headers (`X-Forwarded-For`, `X-Forwarded-Proto`).
+### A. OpenTelemetry Node SDK Setup
+* Configure `@opentelemetry/sdk-node` and `@opentelemetry/auto-instrumentations-node` in Next.js `instrumentation.ts`.
+* Enable trace propagation headers (`traceparent`, `tracestate`) across all internal HTTP calls and API endpoints.
 
-### B. Configure Rate-Limiting Zones
-Implement Nginx rate-limiting on sensitive API endpoints:
-* Create a `limit_req_zone` keyed by client IP (`$binary_remote_addr`) for authentication paths (`/api/auth/signin`, `/api/auth/signup`).
-* Configure request burst buffers and delay structures to block high-frequency probes while allowing legitimate traffic bursts.
+### B. User Journey Span Instrumentation
+Instrument custom spans to track key business transactions:
+* **Creator Onboarding & Provisioning**: Trace tenant registration → K8s namespace creation → DB initialization.
+* **Booking & Payment Journey**: Trace availability lookup → LangGraph agent routing → Stripe Checkout creation → Webhook processing → Express account payout transfer.
 
-### C. Deploy Web Application Firewall (WAF)
-* Enable a lightweight WAF (such as ModSecurity or OWASP Coraza Core Rule Set) running on the Nginx edge.
-* Enforce rules to detect malicious payloads, scanner signatures, and directory traversal attempts.
-
-### D. Export Security Telemetry to Loki & Prometheus
-* Configure Nginx to output access and security block logs in structured JSON format.
-* Set up Promtail to parse Nginx logs, automatically extracting metrics:
-  - `nginx_rate_limit_hits_total`: Count of requests blocked/delayed by rate limits.
-  - `nginx_waf_blocks_total`: Count of requests blocked by security rule matches.
-  - `nginx_auth_failures_total`: Spikes in 401/403 responses on auth routes.
-  - `nginx_ip_violations_total`: Top source IPs blocked.
-
-### E. Build Grafana Security Telemetry Dashboard
-* Add a dedicated Grafana dashboard visualizing live edge request counts, rate-limit hit rates, WAF blocked payloads, and 4xx/5xx status ratios.
-* Set up alerting thresholds to trigger alert notification notifications if rate-limit hits exceed expected baselines.
+### C. Jaeger / Tempo & Grafana APM Integration
+* Export traces via OTLP gRPC/HTTP collectors to Jaeger or Grafana Tempo.
+* Connect trace data with Loki logs and Prometheus metrics in Grafana for unified APM visualization.
+* Configure automated alerts for P95 latency breaches (>500ms) on critical payment endpoints.
 
 ---
 
 ## 3. Study & Reference Materials
-* **NGINX Rate Limiting Guide**: In-depth configurations for rate-limiting zones:  
-  [https://www.nginx.com/blog/rate-limiting-nginx/](https://www.nginx.com/blog/rate-limiting-nginx/)
-* **Nginx WAF & ModSecurity Integration**: Setting up security rule engines on Nginx:  
-  [https://github.com/SpiderLabs/ModSecurity-nginx](https://github.com/SpiderLabs/ModSecurity-nginx)
-* **Parsing Nginx Logs with Promtail/Loki**: Extracting structured telemetry from access logs:  
-  [https://grafana.com/docs/loki/latest/send-data/promtail/](https://grafana.com/docs/loki/latest/send-data/promtail/)
+* **OpenTelemetry Next.js Guide**: Integrating OpenTelemetry tracing in Next.js applications:  
+  [https://nextjs.org/docs/app/building-your-application/optimizing/open-telemetry](https://nextjs.org/docs/app/building-your-application/optimizing/open-telemetry)
+* **Grafana Tempo & Jaeger Tracing**: Best practices for distributed tracing and APM dashboards:  
+  [https://grafana.com/docs/tempo/latest/](https://grafana.com/docs/tempo/latest/)

@@ -6,7 +6,7 @@ This roadmap details the step-by-step transition from a **local Docker Compose**
 
 ## Maturity Roadmap Overview
 
-We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 14 are fully COMPLETED**, **Day 15 is the NEXT ACTIVE PHASE (In Progress)**, and **Days 16 through 20 are FUTURE PHASES**.
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 15 are fully COMPLETED**, **Day 16 is the NEXT ACTIVE PHASE (In Progress)**, and **Days 17 through 20 are FUTURE PHASES**.
 
 ```text
                [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
@@ -36,10 +36,10 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                 [ Day 14: Observability Verification & End-to-End Testing ] (Completed)
                                    │
                                    ▼
-                 [ Day 15: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Next Active Phase - In Progress)
+                 [ Day 15: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Completed & Verified)
                                    │
                                    ▼
-                 [ Day 16: OpenTelemetry Distributed Tracing & Unified APM ] (Future Phase - Outstanding)
+                 [ Day 16: OpenTelemetry Distributed Tracing & Unified APM ] (Next Active Phase - In Progress)
                                    │
                                    ▼
                  [ Day 17: AI FinOps, Token Cost Tracing & Security Guardrails ] (Future Phase - Outstanding)
@@ -49,6 +49,9 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                                    │
                                    ▼
                  [ Day 19: K8s AI Workload Hardening & Outcome-Based Analytics ] (Future Phase - Outstanding)
+                                   │
+                                   ▼
+                 [ Day 20: Final Production Hardening & Disaster Recovery ] (Future Phase - Outstanding)
 ```
 
 ---
@@ -169,34 +172,25 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
 
 ---
 
-## Day 14 — Observability Verification & End-to-End Testing (NEXT ACTIVE PHASE - OUTSTANDING)
+## Day 14 — Observability Verification & End-to-End Testing (COMPLETED)
 * **Goal**: Audit financial transaction metrics and script end-to-end verification workflows.
-* **Tasks**:
-  1. **Expose Business Metrics**: Expose commission balances, payout totals, and pricing model popularity via Prometheus gauges.
-  2. **Grafana ConfigMap updates**: Update the cluster ConfigMap dashboard.
-  3. **E2E Testing Script**: Develop `/infra/scripts/test-e2e-bookings.sh` to automatically simulate onboarding, checkout, webhook callbacks, and payouts.
+* **Tasks Completed**:
+  1. **Exposed Business Metrics**: Instrument `/api/metrics` exposing commission balances (`timeguild_platform_commission_dollars_total`), payout totals (`timeguild_provider_payouts_dollars_total`), and pricing model usage (`timeguild_pricing_model_usage_total`).
+  2. **Grafana ConfigMap Updates**: Updated cluster ConfigMap dashboard with financial metric panels.
+  3. **E2E Testing Script**: Developed `/infra/scripts/test-e2e-bookings.sh` to automatically simulate onboarding, checkout, webhook callbacks, and payouts.
 
 ---
 
-## Day 15 — Testing Framework Restoration & E2E Validation (FUTURE PHASE - OUTSTANDING)
-* **Goal**: Re-architect and restore Vitest test suites aligning with the refactored database schemas and flexible booking rules.
-* **Tasks**:
-  1. **Codebase State Machine Audit**: Document dynamic slot-slicing bounds and state machine transition rules.
-  2. **Unit Test Suite Rebuild**: Write unit tests covering pricing, commission calculations, and late cancellation guards.
-  3. **Integration Test Suite Rebuild**: Write integration tests covering availability rule synchronization, Stripe Webhooks mock processing, and Stripe Connect split payout rules.
+## Day 15 — Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry (COMPLETED & VERIFIED)
+* **Goal**: Configure an Nginx edge proxy with WAF security rules, rate-limiting zones, observation mode, and JSON telemetry export to Grafana.
+* **Tasks Completed**:
+  1. **Nginx Reverse Proxy & TLS Ingress**: Set up Nginx sidecar/proxy with TLS termination and downstream header forwarding (`X-Forwarded-For`, `X-Forwarded-Proto`).
+  2. **API Rate Limiting**: Limit high-frequency API probes on sensitive paths (`auth_limit: 5r/s`, `checkout_limit: 10r/s`, `api_limit: 30r/s`).
+  3. **WAF Security & JSON Telemetry Export**: Configured OWASP-aligned SQLi/XSS/Probe blocking rules, parsed security blocks into JSON via Promtail, and resolved Grafana Panel 201 stat/vector aggregation errors.
 
 ---
 
-## Day 16 — Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry (FUTURE PHASE - OUTSTANDING)
-* **Goal**: Configure an Nginx edge proxy with WAF rules and rate-limiting zones to filter and monitor edge request traffic.
-* **Tasks**:
-  1. **Nginx Reverse Proxy & TLS Ingress**: Set up Nginx to terminate TLS and forward requests to internal cluster ingresses.
-  2. **API Rate Limiting**: Limit high-frequency API probes on sensitive paths like checkout and authentication routes.
-  3. **WAF Security & Telemetry Export**: Deploy OWASP Coraza WAF rules on Nginx, parse blocks to JSON, and collect/forward security alerts to Prometheus & Grafana.
-
----
-
-## Day 17 — OpenTelemetry Distributed Tracing & Unified APM (FUTURE PHASE - OUTSTANDING)
+## Day 16 — OpenTelemetry Distributed Tracing & Unified APM (NEXT ACTIVE PHASE - OUTSTANDING)
 * **Goal**: Trace complete end-to-end user transactions across Next.js API endpoints, Stripe Webhooks, database queries, and async jobs.
 * **Tasks**:
   1. **OpenTelemetry Node SDK Setup**: Integrate `@opentelemetry/sdk-node` into Next.js `instrumentation.ts`.
@@ -205,7 +199,7 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
 
 ---
 
-## Day 18 — AI FinOps, Token Cost Tracing & Security Guardrails (FUTURE PHASE - OUTSTANDING)
+## Day 17 — AI FinOps, Token Cost Tracing & Security Guardrails (FUTURE PHASE - OUTSTANDING)
 * **Goal**: Track token-level costs, monitor LLM API latency, enforce prompt security guardrails, and auto-summarize incidents.
 * **Tasks**:
   1. **Token Cost Attribution Telemetry**: Instrument AI requests with Prometheus metrics (`timeguild_llm_tokens_total`, `timeguild_llm_cost_cents_total`) tagged by tenant, model, and endpoint.
@@ -215,18 +209,29 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
 
 ---
 
-## Day 19 — Model Context Protocol (MCP) Integration Infrastructure (FUTURE PHASE - OUTSTANDING)
+## Day 18 — Model Context Protocol (MCP) Integration Infrastructure (FUTURE PHASE - OUTSTANDING)
 * **Goal**: Adopt Model Context Protocol (MCP) to allow platform AI agents to securely connect to external tools and data sources.
 * **Tasks**:
-  1. **MCP Server Integration**: Authored `src/lib/mcp/server.ts` exposing Time Guild primitives (bookings, slots, creator profiles, metrics) as standard MCP tools.
+  1. **MCP Server Integration**: Author `src/lib/mcp/server.ts` exposing Time Guild primitives (bookings, slots, creator profiles, metrics) as standard MCP tools.
   2. **MCP Client Agent Integration**: Equip internal agents with an MCP client interface to securely pull external context (calendars, GitHub, web data).
   3. **Granular Permissions & Tool Auth**: Implement RBAC and token isolation for external tool invocation.
 
 ---
 
-## Day 20 — K8s AI Workload Hardening & Outcome-Based Analytics (FUTURE PHASE - OUTSTANDING)
+## Day 19 — K8s AI Workload Hardening & Outcome-Based Analytics (FUTURE PHASE - OUTSTANDING)
 * **Goal**: Harden Kubernetes for AI/inference workloads and establish outcome-based pricing analytics.
 * **Tasks**:
   1. **Pod Resource Limits & PodDisruptionBudgets**: Configure explicit memory/CPU limits and PodDisruptionBudgets across tenant namespaces.
+  2. **KEDA / HPA Queue Autoscaling**: Deploy KEDA or HPA rules for autoscaling tenant workloads based on queue depth and request concurrency.
+  3. **Outcome-Based Metrics**: Expose Prometheus gauges for booking success rates, agent intervention value, and automated time saved.
+
+---
+
+## Day 20 — Final Production Hardening & Disaster Recovery (FUTURE PHASE - OUTSTANDING)
+* **Goal**: Execute production scale validation, disaster recovery playbooks, and final end-to-end security audits.
+* **Tasks**:
+  1. **Production Scale Validation**: Conduct synthetic load testing across multi-tenant cluster nodes.
+  2. **Disaster Recovery & Backup Playbooks**: Implement automated database snapshot backups and multi-region failover procedures.
+  3. **Final Security Audit**: Complete end-to-end penetration testing, secret scanning, and compliance verification.
   2. **KEDA / HPA Queue Autoscaling**: Deploy KEDA or HPA rules for autoscaling tenant workloads based on queue depth and request concurrency.
   3. **Outcome-Based Metrics**: Expose Prometheus gauges for booking success rates, agent intervention value, and automated time saved.
