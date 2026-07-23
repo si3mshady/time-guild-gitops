@@ -6,7 +6,7 @@ This roadmap details the step-by-step transition from a **local Docker Compose**
 
 ## Maturity Roadmap Overview
 
-We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 15 are fully COMPLETED**, **Day 16 is the NEXT ACTIVE PHASE (In Progress)**, and **Days 17 through 20 are FUTURE PHASES**.
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 17 are fully COMPLETED**, **Day 18 is the NEXT ACTIVE PHASE (In Progress)**, and **Days 19 through 20 are FUTURE PHASES**.
 
 ```text
                [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
@@ -39,13 +39,13 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                  [ Day 15: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Completed & Verified)
                                    │
                                    ▼
-                 [ Day 16: OpenTelemetry Distributed Tracing & Unified APM ] (Next Active Phase - In Progress)
+                 [ Day 16: OpenTelemetry Distributed Tracing & Unified APM ] (Completed & Verified)
                                    │
                                    ▼
-                 [ Day 17: AI FinOps, Token Cost Tracing & Security Guardrails ] (Future Phase - Outstanding)
+                 [ Day 17: AI FinOps, Token Cost Tracing & Security Guardrails ] (Completed & Verified)
                                    │
                                    ▼
-                 [ Day 18: Model Context Protocol (MCP) Integration Infrastructure ] (Future Phase - Outstanding)
+                 [ Day 18: Model Context Protocol (MCP) Integration Infrastructure ] (Next Active Phase - In Progress)
                                    │
                                    ▼
                  [ Day 19: K8s AI Workload Hardening & Outcome-Based Analytics ] (Future Phase - Outstanding)
@@ -199,17 +199,17 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
 
 ---
 
-## Day 17 — AI FinOps, Token Cost Tracing & Security Guardrails (FUTURE PHASE - OUTSTANDING)
+## Day 17 — AI FinOps, Token Cost Tracing & Security Guardrails (COMPLETED & VERIFIED)
 * **Goal**: Track token-level costs, monitor LLM API latency, enforce prompt security guardrails, and auto-summarize incidents.
-* **Tasks**:
-  1. **Token Cost Attribution Telemetry**: Instrument AI requests with Prometheus metrics (`timeguild_llm_tokens_total`, `timeguild_llm_cost_cents_total`) tagged by tenant, model, and endpoint.
-  2. **AI FinOps Grafana Dashboard**: Build visual panels comparing AI operational costs against platform revenue.
-  3. **AI Security Guardrails Middleware**: Add prompt injection detection, input validation, and PII filtering for AI agent endpoints.
-  4. **AI SRE Incident Summarization Agent**: Deploy an automated agent hook to summarize Loki error logs into incident summaries.
+* **Tasks Completed**:
+  1. **Token Cost Attribution & Invocation Telemetry**: Instrumented AI requests with Prometheus metrics (`timeguild_agent_invocations_total`, `timeguild_llm_tokens_total`, `timeguild_llm_cost_cents_total`) tagged by agent_type, model, and status.
+  2. **AI FinOps Grafana Dashboard**: Created dedicated ConfigMap dashboard (`infra/monitoring/timeguild-ai-finops-dashboard.yaml`) visualizing Invocations/sec, Total Invocations, Token Breakdown, AI Spend Attribution ($), and Security Threat Shielding.
+  3. **AI Security Guardrails Middleware**: Implemented `evaluateSecurityGuardrails` in `src/lib/agent/guardrails.ts` protecting endpoints against prompt injection, secret API key exposures, PII leakage, and off-platform payment solicitations.
+  4. **Loki SRE Incident Summarization Agent**: Deployed automated SRE incident summarizer (`src/lib/agent/incident-summarizer.ts`) parsing Loki log bursts and synthesizing actionable incident reports.
 
 ---
 
-## Day 18 — Model Context Protocol (MCP) Integration Infrastructure (FUTURE PHASE - OUTSTANDING)
+## Day 18 — Model Context Protocol (MCP) Integration Infrastructure (NEXT ACTIVE PHASE - OUTSTANDING)
 * **Goal**: Adopt Model Context Protocol (MCP) to allow platform AI agents to securely connect to external tools and data sources.
 * **Tasks**:
   1. **MCP Server Integration**: Author `src/lib/mcp/server.ts` exposing Time Guild primitives (bookings, slots, creator profiles, metrics) as standard MCP tools.
@@ -233,5 +233,3 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
   1. **Production Scale Validation**: Conduct synthetic load testing across multi-tenant cluster nodes.
   2. **Disaster Recovery & Backup Playbooks**: Implement automated database snapshot backups and multi-region failover procedures.
   3. **Final Security Audit**: Complete end-to-end penetration testing, secret scanning, and compliance verification.
-  2. **KEDA / HPA Queue Autoscaling**: Deploy KEDA or HPA rules for autoscaling tenant workloads based on queue depth and request concurrency.
-  3. **Outcome-Based Metrics**: Expose Prometheus gauges for booking success rates, agent intervention value, and automated time saved.

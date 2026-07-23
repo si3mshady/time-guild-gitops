@@ -1,43 +1,53 @@
 # Day 17: AI FinOps, Token Cost Tracing & Security Guardrails
 
-> [!WARNING]
-> **Status: OUTSTANDING (Future Phase)**
+> [!IMPORTANT]
+> **Status: COMPLETED & VERIFIED**
+> *For a full overview of AI agent telemetry, security guardrails, and Grafana AI FinOps dashboard integration, see [k8s_gitops_roadmap.md](file:///home/si3mshady/time-guild/docs/learning-resources/k8s_gitops_roadmap.md).*
 
 ---
 
 ## 1. Architectural Rationale: Why We Do This
-Integrating serverless LLM agents (DeepSeek API, LangGraph) into a multi-tenant platform introduces variable operational costs and potential security vectors. 
-* **Token Cost Attribution**: Platform operators must track token usage and cost per tenant, model, and tool invocation to maintain positive margins.
-* **AI Security Guardrails**: Protecting agent endpoints from prompt injections, unexpected tool calls, and PII leakage ensures system safety and trust.
+Integrating serverless LLM agents (DeepSeek API, LangGraph.js) into a multi-tenant scheduling marketplace introduces variable operational costs and potential security attack vectors. 
+* **Token Cost Attribution & FinOps**: Platform operators must track token usage (`prompt_tokens`, `completion_tokens`) and cost attribution in cents per tenant, model (`deepseek-chat`), and sub-agent (`scheduling`, `supervisor`, `chat`, `incident_summarizer`) to maintain healthy unit economics.
+* **AI Security Guardrails Middleware**: Inspecting incoming user prompts before LLM invocation shields the system against prompt injections, secret API key exposures, PII leaks, and off-platform payment solicitations (CashApp, Venmo, Zelle).
+* **Loki Error Log Automated Incident Summarization**: Harnessing AI agents to read Loki error log bursts or webhook failure stacks, generating structured SRE incident summaries with actionable remediation advice.
 
 ---
 
-## 2. Core Tasks
+## 2. Core Technical Implementations
 
-### A. Token Cost Attribution Telemetry
-Instrument AI agent route handlers (`/api/agent/schedule`, `/api/agent/supervisor`) with Prometheus metrics:
-* `timeguild_llm_tokens_total`: Counter tracking prompt and completion tokens grouped by `{tenant, model, action}`.
-* `timeguild_llm_cost_cents_total`: Calculated cost metric in cents based on model token pricing tiers.
+### A. AI Token Usage & Cost Attribution Telemetry (`src/lib/agent/telemetry.ts`)
+* **Persistence & Calculation**: Persists token metrics in SQLite (`ai_token_usage` table) and calculates estimated cost in cents based on model token rates ($0.14/1M input, $0.28/1M output for DeepSeek API).
+* **Prometheus Exposition (`/api/metrics`)**:
+  - `timeguild_agent_invocations_total{agent_type, status}`: Counter tracking AI agent calls (success, error, blocked).
+  - `timeguild_llm_tokens_total{agent_type, model, type}`: Counter tracking prompt vs completion token consumption.
+  - `timeguild_llm_cost_cents_total{agent_type, model}`: Counter tracking LLM cost in cents per agent tier.
+  - `timeguild_ai_guardrail_blocks_total{guardrail_type, agent_type}`: Counter tracking security block events.
+  - `timeguild_ai_incident_summaries_total{severity}`: Counter tracking SRE incident summaries generated.
 
-### B. AI FinOps Grafana Dashboard
-Build visual Grafana panels:
-* Real-time LLM cost spend vs platform commission revenue.
-* Token consumption breakdown per tenant and sub-agent (`provider_setup`, `client_booking`, `lifecycle_support`).
+### B. AI Security Guardrails Middleware (`src/lib/agent/guardrails.ts`)
+Evaluates user prompts before LLM invocation across four security layers:
+1. **Prompt Injection Protection**: Rejects prompt overrides, jailbreaks, system prompt extractions, and synthetic admin tags (e.g. `ignore previous instructions`, `system prompt`, `developer mode`).
+2. **Secret API Key Shielding**: Rejects inputs containing live/test Stripe keys, DeepSeek API keys, or high-entropy tokens.
+3. **Off-Platform Solicitations**: Rejects attempts to bypass Stripe Connect platform holding via CashApp, Venmo, Zelle, or PayPal.
+4. **PII Sanitization**: Obfuscates SSNs, credit cards, emails, and phone numbers before payload forwarding using `scanAndObfuscateLeakage`.
 
-### C. AI Security Guardrails Middleware
-Implement lightweight security layer for LLM inputs and outputs:
-* **Prompt Injection Detection**: Filter malicious user prompts attempting system instruction overrides or unauthorized tool calls.
-* **PII Sanitization & Moderation**: Scrub sensitive client data before forwarding payloads to LLM APIs.
+### C. Loki Error Log Automated Incident Summarization Agent (`src/lib/agent/incident-summarizer.ts`)
+* **Endpoint**: `POST /api/agent/incident-summarizer` & `GET /api/agent/incident-summarizer`.
+* **Behavior**: Analyzes Loki log bursts / error stack traces using DeepSeek API to produce structured JSON incident reports (Title, Severity, AI Summary, Recommended Remediation Action). Saves results to `ai_incident_summaries` table.
 
-### D. AI SRE Incident Summarization Agent
-Deploy an automated SRE agent hook:
-* Monitor Loki error log bursts.
-* Synthesize error stacks and emit structured incident summaries to administrative channels.
+### D. Dedicated Grafana AI FinOps & Security Dashboard (`infra/monitoring/timeguild-ai-finops-dashboard.yaml`)
+* ConfigMap manifest providing real-time visualization of:
+  - **Panel 301-304**: AI Agent Invocations/sec, Total Invocations, Total Tokens, Total Spend USD ($).
+  - **Panel 306-307**: Token Consumption by Sub-Agent & Token Type, Spend Attribution per Agent ($).
+  - **Panel 309-310**: AI Security Guardrail Blocks Triggered & Threat Breakdown.
+  - **Panel 312**: Loki SRE Incident Summaries Generated by Severity.
 
 ---
 
-## 3. Study & Reference Materials
-* **LangChain / LangGraph Observability**: Tracing agent steps and token consumption:  
-  [https://js.langchain.com/docs/how_to/callbacks_async/](https://js.langchain.com/docs/how_to/callbacks_async/)
-* **OWASP Top 10 for LLM Applications**: Key security risks and mitigation practices for AI systems:  
-  [https://owasp.org/www-project-top-10-for-large-language-model-applications/](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+## 3. Verification & Testing
+* Automated end-to-end test suite (`infra/scripts/test-day17-ai-finops.ts`) executed cleanly:
+  - Prompt Injection Detection: **Verified Blocked** (`HTTP 403`).
+  - Off-Platform Solicitation Detection: **Verified Blocked** (`HTTP 403`).
+  - Telemetry Recording & Prometheus `/api/metrics` Export: **Verified Clean Exposition**.
+  - Loki Automated Incident Summarization Agent: **Verified Critical/Warning Synthesis**.

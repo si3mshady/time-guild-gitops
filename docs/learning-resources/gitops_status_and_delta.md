@@ -6,7 +6,7 @@ This document evaluates the current maturity of the Time Guild project's contain
 
 ## 1. Current Status & Progress Summary
 
-The Time Guild application and deployment infrastructure are highly mature, having completed **19 out of 24** planned implementation phases (Days 1–15 are COMPLETED; Day 16 is CURRENT ACTIVE PHASE; Days 17–20 are FUTURE PHASES):
+The Time Guild application and deployment infrastructure are highly mature, having completed **20 out of 24** planned implementation phases (Days 1–17 are COMPLETED; Day 18 is CURRENT ACTIVE PHASE; Days 19–20 are FUTURE PHASES):
 
 | Day | Focus Area | Status | Key Deliverables |
 | :--- | :--- | :--- | :--- |
@@ -29,9 +29,9 @@ The Time Guild application and deployment infrastructure are highly mature, havi
 | **Day 13** | Visual Calendar & Scheduling | **COMPLETED** | Interactive monthly/weekly visual calendar grid on dashboard, month navigation controls, date tabs & time slot pills picker on creator profile page. |
 | **Day 14** | E2E Testing & Business Metrics | **COMPLETED** | Financial metrics in `/api/metrics`, Grafana financial panels, E2E CLI simulation script (`test-e2e-bookings.sh`). |
 | **Day 15** | Nginx Edge Proxy, SSL & WAF | **COMPLETED & VERIFIED** | Nginx sidecar, rate-limiting rules, WAF security filters, Promtail JSON telemetry export, Grafana Panel 201 fixes, auth lifecycle redirect fixes. |
-| **Day 16** | Distributed Tracing & APM | **CURRENT ACTIVE PHASE (In Progress)** | OpenTelemetry Node SDK, distributed tracing across API/webhooks, Jaeger/Tempo trace integration, SLO P95 latency alerts. |
-| **Day 17** | AI FinOps, Tracing & Guardrails | **FUTURE PHASE (OUTSTANDING)** | Token-level cost attribution, LLM latency metrics, AI guardrails (prompt injection/PII), incident summary agent. |
-| **Day 18** | Model Context Protocol (MCP) | **FUTURE PHASE (OUTSTANDING)** | MCP server/client integration for AI agents, external tool connectors (calendars, GitHub, web data). |
+| **Day 16** | Distributed Tracing & APM | **COMPLETED & VERIFIED** | OpenTelemetry Node SDK, distributed tracing across API/webhooks, Jaeger/Tempo trace integration, SLO P95 latency alerts. |
+| **Day 17** | AI FinOps, Tracing & Guardrails | **COMPLETED & VERIFIED** | Token-level cost attribution, LLM token counters (`timeguild_llm_tokens_total`, `timeguild_llm_cost_cents_total`), AI agent invocation counters (`timeguild_agent_invocations_total`), AI security guardrails middleware, Loki incident summarizer agent, dedicated Grafana AI FinOps dashboard. |
+| **Day 18** | Model Context Protocol (MCP) | **CURRENT ACTIVE PHASE (In Progress)** | MCP server/client integration for AI agents, external tool connectors (calendars, GitHub, web data). |
 | **Day 19** | K8s AI Hardening & Analytics | **FUTURE PHASE (OUTSTANDING)** | Pod resource limits/HPA, queue autoscaling, model inference metrics, outcome-based pricing analytics. |
 | **Day 20** | Final Production Hardening | **FUTURE PHASE (OUTSTANDING)** | Production scale validation, disaster recovery playbooks, final end-to-end security audits. |
 
@@ -41,36 +41,21 @@ The Time Guild application and deployment infrastructure are highly mature, havi
 
 To bring the project to 100% production readiness aligned with 2026 AI-era DevOps & Platform standards, we must execute the following active and planned phases:
 
-### A. OpenTelemetry Distributed Tracing & Unified APM (Day 16 - Current Active Phase - Outstanding)
-* **Goal**: Full distributed tracing across API routes, Stripe webhooks, database calls, and async jobs to monitor entire user transaction journeys.
-* **Outstanding Actions**:
-  1. **OpenTelemetry Node SDK**: Configure `@opentelemetry/sdk-node` in Next.js `instrumentation.ts`.
-  2. **End-to-End Journey Tracing**: Instrument spans connecting Creator Onboarding → Availability Setup → Booking Checkout → Stripe Webhooks → Connected Account Transfer.
-  3. **SLO Alerting**: Define P95 latency alerts (<500ms) and error-budget burn rates on critical payment routes.
-
-### B. AI FinOps, LLM Tracing & Security Guardrails (Day 17 - Future Phase - Outstanding)
-* **Goal**: Implement token-level cost attribution, LLM performance telemetry, and AI security guardrails.
-* **Outstanding Actions**:
-  1. **Token Cost Attribution**: Expose Prometheus metrics (`timeguild_llm_tokens_total`, `timeguild_llm_cost_cents_total`) grouped by model, tenant, and action.
-  2. **AI FinOps Dashboard**: Add Grafana panels tracking real-time LLM spending vs transaction revenue.
-  3. **AI Guardrails Layer**: Implement middleware for prompt injection detection, PII sanitization, and output moderation.
-  4. **Incident Summary Agent**: Deploy an agentic hook to auto-summarize Loki error bursts into actionable SRE incident notes.
-
-### C. Model Context Protocol (MCP) Integration Infrastructure (Day 18 - Future Phase - Outstanding)
+### A. Model Context Protocol (MCP) Integration Infrastructure (Day 18 - Current Active Phase - Outstanding)
 * **Goal**: Enable platform AI agents to securely connect to external tools and data sources via MCP.
 * **Outstanding Actions**:
   1. **MCP Server Integration**: Implement `src/lib/mcp/server.ts` exposing Time Guild primitives (bookings, slots, creator profiles) as standard MCP tool endpoints.
   2. **MCP Client & Agent Orchestration**: Equip internal agents with MCP client capabilities to query external systems (calendars, GitHub, web data) dynamically.
   3. **Granular Permissions & Tool Auth**: Enforce RBAC and token isolation for external tool invocation.
 
-### D. K8s AI Workload Hardening & Outcome-Based Analytics (Day 19 - Future Phase - Outstanding)
+### B. K8s AI Workload Hardening & Outcome-Based Analytics (Day 19 - Future Phase - Outstanding)
 * **Goal**: Harden Kubernetes for AI/inference payloads and establish outcome-based pricing analytics.
 * **Outstanding Actions**:
   1. **Pod Resource Limits & Autoscaling**: Configure explicit CPU/memory limits, HPA/KEDA autoscaling rules, and PodDisruptionBudgets.
   2. **Model Service Metrics**: Add GPU/CPU inference queue length metrics and latency tracking for downstream AI workers.
   3. **Outcome-Based Metrics**: Expose gauges measuring booking success rate, agent intervention value, and automated time saved.
 
-### E. Final Production Hardening & Disaster Recovery (Day 20 - Future Phase - Outstanding)
+### C. Final Production Hardening & Disaster Recovery (Day 20 - Future Phase - Outstanding)
 * **Goal**: Execute production scale validation, disaster recovery playbooks, and final end-to-end security audits.
 * **Outstanding Actions**:
   1. **Production Scale Validation**: Conduct synthetic load testing across multi-tenant cluster nodes.
@@ -81,5 +66,5 @@ To bring the project to 100% production readiness aligned with 2026 AI-era DevOp
 
 ## 3. Immediate Action Plan
 
-1. **Execute Day 16**: Implement OpenTelemetry Node SDK, distributed journey tracing, and Jaeger/Tempo APM integration.
-2. **Roll out Days 17–20 (2026 AI-Era DevOps Stack)**: Implement AI FinOps & guardrails, MCP integration, K8s AI workload hardening, and production scale/DR validation.
+1. **Execute Day 18**: Implement Model Context Protocol (MCP) server & client infrastructure.
+2. **Roll out Days 19–20 (2026 AI-Era DevOps Stack)**: Implement K8s AI workload hardening, outcome-based analytics, and production scale/DR validation.
