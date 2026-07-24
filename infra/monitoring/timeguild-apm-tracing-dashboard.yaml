@@ -73,7 +73,7 @@ data:
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
-              "expr": "sum(timeguild_trace_spans_total)",
+              "expr": "max(timeguild_trace_spans_total)",
               "legendFormat": "Total Spans",
               "range": true,
               "refId": "A"
@@ -114,8 +114,8 @@ data:
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
-              "expr": "timeguild_span_duration_seconds_p95{journey=\"creator_payout\"}",
-              "legendFormat": "P95 Payout Span",
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"creator_payout\"})",
+              "legendFormat": "P95 Creator Payout",
               "range": true,
               "refId": "A"
             }
@@ -155,8 +155,8 @@ data:
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
-              "expr": "timeguild_span_duration_seconds_p95{journey=\"agent_scheduling\"}",
-              "legendFormat": "P95 Scheduling Span",
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"agent_scheduling\"})",
+              "legendFormat": "P95 Agent Scheduling",
               "range": true,
               "refId": "A"
             }
@@ -183,7 +183,7 @@ data:
           "id": 404,
           "options": {
             "colorMode": "value",
-            "graphMode": "none",
+            "graphMode": "area",
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
@@ -194,8 +194,8 @@ data:
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
-              "expr": "timeguild_span_duration_seconds_p95{journey=\"checkout\"}",
-              "legendFormat": "P95 Checkout Span",
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"checkout\"})",
+              "legendFormat": "P95 Stripe Checkout",
               "range": true,
               "refId": "A"
             }
@@ -233,7 +233,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "timeguild_span_duration_seconds_p95",
+              "expr": "max by (journey) (timeguild_span_duration_seconds_p95)",
               "legendFormat": "{{journey}}",
               "refId": "A"
             }
@@ -259,7 +259,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "timeguild_span_duration_seconds_p95",
+              "expr": "max by (journey) (timeguild_span_duration_seconds_p95)",
               "legendFormat": "{{journey}}",
               "refId": "A"
             }
@@ -306,5 +306,5 @@ data:
       "timezone": "browser",
       "title": "Time Guild - OpenTelemetry APM & Distributed Tracing",
       "uid": "timeguild-apm-tracing",
-      "version": 1
+      "version": 2
     }
