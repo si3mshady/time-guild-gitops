@@ -48,6 +48,7 @@ data:
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
+              "description": "Total cumulative count of OpenTelemetry spans exported via OTLP to Jaeger.",
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
@@ -66,7 +67,7 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "textMode": "auto"
+            "textMode": "value"
           },
           "pluginVersion": "10.0.0",
           "targets": [
@@ -74,7 +75,7 @@ data:
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
               "expr": "max(timeguild_trace_spans_total)",
-              "legendFormat": "Total Spans",
+              "legendFormat": "",
               "range": true,
               "refId": "A"
             }
@@ -87,6 +88,7 @@ data:
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
+              "description": "95th percentile latency of Stripe Express creator payout transfer execution (stripe.transfers.create).",
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
@@ -107,7 +109,7 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "textMode": "auto"
+            "textMode": "value"
           },
           "pluginVersion": "10.0.0",
           "targets": [
@@ -115,12 +117,12 @@ data:
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
               "expr": "max(timeguild_span_duration_seconds_p95{journey=\"creator_payout\"})",
-              "legendFormat": "P95 Creator Payout",
+              "legendFormat": "",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "P95 Creator Payout Span Latency",
+          "title": "Creator Payout Latency (P95)",
           "type": "stat"
         },
         {
@@ -128,6 +130,7 @@ data:
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
+              "description": "95th percentile latency of DeepSeek / LangGraph multi-agent scheduling graph execution.",
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
@@ -148,7 +151,7 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "textMode": "auto"
+            "textMode": "value"
           },
           "pluginVersion": "10.0.0",
           "targets": [
@@ -156,12 +159,12 @@ data:
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
               "expr": "max(timeguild_span_duration_seconds_p95{journey=\"agent_scheduling\"})",
-              "legendFormat": "P95 Agent Scheduling",
+              "legendFormat": "",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "P95 AI Agent Scheduling Span Latency",
+          "title": "AI Agent Scheduling Latency (P95)",
           "type": "stat"
         },
         {
@@ -169,6 +172,7 @@ data:
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
+              "description": "95th percentile latency of Stripe Checkout session creation and slot locking.",
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
@@ -187,7 +191,7 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "textMode": "auto"
+            "textMode": "value"
           },
           "pluginVersion": "10.0.0",
           "targets": [
@@ -195,19 +199,19 @@ data:
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
               "expr": "max(timeguild_span_duration_seconds_p95{journey=\"checkout\"})",
-              "legendFormat": "P95 Stripe Checkout",
+              "legendFormat": "",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "P95 Stripe Checkout Span Latency",
+          "title": "Stripe Checkout Latency (P95)",
           "type": "stat"
         },
         {
           "collapsed": false,
           "gridPos": { "h": 2, "w": 24, "x": 0, "y": 6 },
           "id": 405,
-          "title": "📈 P95 Transaction Span Latencies by Business Journey",
+          "title": "📈 Transaction Latency Trends & Cross-Journey Comparison",
           "type": "row"
         },
         {
@@ -224,7 +228,7 @@ data:
               "unit": "s"
             }
           },
-          "gridPos": { "h": 8, "w": 16, "x": 0, "y": 8 },
+          "gridPos": { "h": 8, "w": 14, "x": 0, "y": 8 },
           "id": 406,
           "options": {
             "legend": { "displayMode": "table", "placement": "bottom" },
@@ -233,12 +237,36 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "max by (journey) (timeguild_span_duration_seconds_p95)",
-              "legendFormat": "{{journey}}",
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"creator_payout\"})",
+              "legendFormat": "Creator Payout Transfer",
               "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"agent_scheduling\"})",
+              "legendFormat": "AI Agent Scheduling",
+              "refId": "B"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"checkout\"})",
+              "legendFormat": "Stripe Checkout Session",
+              "refId": "C"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"webhook\"})",
+              "legendFormat": "Stripe Webhook Processing",
+              "refId": "D"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"onboarding\"})",
+              "legendFormat": "Creator K8s Onboarding",
+              "refId": "E"
             }
           ],
-          "title": "P95 Transaction Latency per User Journey",
+          "title": "P95 Transaction Latency Over Time (by User Journey)",
           "type": "timeseries"
         },
         {
@@ -259,7 +287,7 @@ data:
               "unit": "s"
             }
           },
-          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+          "gridPos": { "h": 8, "w": 10, "x": 14, "y": 8 },
           "id": 407,
           "options": {
             "displayMode": "lcd",
@@ -276,13 +304,45 @@ data:
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
-              "expr": "max by (journey) (timeguild_span_duration_seconds_p95)",
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"agent_scheduling\"})",
               "instant": true,
-              "legendFormat": "{{journey}}",
+              "legendFormat": "AI Agent Scheduling",
               "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"creator_payout\"})",
+              "instant": true,
+              "legendFormat": "Creator Payout Transfer",
+              "refId": "B"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"checkout\"})",
+              "instant": true,
+              "legendFormat": "Stripe Checkout Session",
+              "refId": "C"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"onboarding\"})",
+              "instant": true,
+              "legendFormat": "Creator K8s Onboarding",
+              "refId": "D"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "max(timeguild_span_duration_seconds_p95{journey=\"webhook\"})",
+              "instant": true,
+              "legendFormat": "Stripe Webhook Processing",
+              "refId": "E"
             }
           ],
-          "title": "Span Latency Comparison by Journey",
+          "title": "Span Latency Comparison by Journey (LCD Meter)",
           "type": "bargauge"
         },
         {
@@ -294,6 +354,11 @@ data:
         },
         {
           "datasource": { "type": "loki", "uid": "loki" },
+          "fieldConfig": {
+            "defaults": {
+              "description": "Real-time Loki log stream filtered for structured [OBSERVABILITY] events containing active trace_id and span_id correlation parameters."
+            }
+          },
           "gridPos": { "h": 8, "w": 24, "x": 0, "y": 18 },
           "id": 409,
           "options": {
@@ -324,5 +389,5 @@ data:
       "timezone": "browser",
       "title": "Time Guild - OpenTelemetry APM & Distributed Tracing",
       "uid": "timeguild-apm-tracing",
-      "version": 2
+      "version": 3
     }
