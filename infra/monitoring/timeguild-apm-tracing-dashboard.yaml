@@ -376,7 +376,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "loki", "uid": "Loki" },
-              "expr": "{container=~\"timeguild.*\"} |= \"[OBSERVABILITY]\"",
+              "expr": "{namespace=~\".*\"} |= \"[OBSERVABILITY]\"",
               "refId": "A"
             }
           ],
