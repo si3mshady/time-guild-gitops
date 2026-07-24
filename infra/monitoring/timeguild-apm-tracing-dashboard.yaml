@@ -353,7 +353,7 @@ data:
           "type": "row"
         },
         {
-          "datasource": { "type": "loki", "uid": "loki" },
+          "datasource": { "type": "loki", "uid": "Loki" },
           "fieldConfig": {
             "defaults": {
               "description": "Real-time Loki log stream filtered for structured [OBSERVABILITY] events containing active trace_id and span_id correlation parameters."
@@ -371,7 +371,7 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "loki", "uid": "loki" },
+              "datasource": { "type": "loki", "uid": "Loki" },
               "expr": "{container=~\"timeguild.*\"} |= \"[OBSERVABILITY]\"",
               "refId": "A"
             }
