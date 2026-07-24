@@ -1,7 +1,7 @@
 # Day 16: OpenTelemetry Distributed Tracing & Unified APM
 
 > [!IMPORTANT]
-> **Status: OUTSTANDING (Current Active Phase)**
+> **Status: CURRENT ACTIVE PHASE (In Progress)**
 
 ---
 

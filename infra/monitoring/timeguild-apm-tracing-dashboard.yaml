@@ -1,0 +1,311 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: timeguild-apm-tracing-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  timeguild-apm-tracing-dashboard.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": 4,
+      "links": [
+        {
+          "icon": "external link",
+          "includeVars": true,
+          "keepTime": true,
+          "targetBlank": true,
+          "title": "Jaeger Tracing UI",
+          "type": "link",
+          "url": "http://localhost:16686"
+        }
+      ],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 2, "w": 24, "x": 0, "y": 0 },
+          "id": 400,
+          "title": "⚡ OpenTelemetry Distributed Tracing & Unified APM Overview",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null }
+                ]
+              },
+              "unit": "short"
+            }
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 2 },
+          "id": 401,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "sum(timeguild_trace_spans_total)",
+              "legendFormat": "Total Spans",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Total Spans Exported (OTLP)",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 0.3 },
+                  { "color": "red", "value": 0.5 }
+                ]
+              },
+              "unit": "s"
+            }
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 2 },
+          "id": 402,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "timeguild_span_duration_seconds_p95{journey=\"creator_payout\"}",
+              "legendFormat": "P95 Payout Span",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P95 Creator Payout Span Latency",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 0.4 },
+                  { "color": "red", "value": 0.8 }
+                ]
+              },
+              "unit": "s"
+            }
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 12, "y": 2 },
+          "id": 403,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "timeguild_span_duration_seconds_p95{journey=\"agent_scheduling\"}",
+              "legendFormat": "P95 Scheduling Span",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P95 AI Agent Scheduling Span Latency",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "blue", "value": null }
+                ]
+              },
+              "unit": "s"
+            }
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 18, "y": 2 },
+          "id": 404,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "timeguild_span_duration_seconds_p95{journey=\"checkout\"}",
+              "legendFormat": "P95 Checkout Span",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P95 Stripe Checkout Span Latency",
+          "type": "stat"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 2, "w": 24, "x": 0, "y": 6 },
+          "id": 405,
+          "title": "📈 P95 Transaction Span Latencies by Business Journey",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "showPoints": "auto"
+              },
+              "unit": "s"
+            }
+          },
+          "gridPos": { "h": 8, "w": 16, "x": 0, "y": 8 },
+          "id": 406,
+          "options": {
+            "legend": { "displayMode": "table", "placement": "bottom" },
+            "tooltip": { "mode": "multi" }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "expr": "timeguild_span_duration_seconds_p95",
+              "legendFormat": "{{journey}}",
+              "refId": "A"
+            }
+          ],
+          "title": "P95 Transaction Latency per User Journey",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "unit": "s"
+            }
+          },
+          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+          "id": 407,
+          "options": {
+            "displayMode": "basic",
+            "orientation": "horizontal",
+            "reduceOptions": { "calcs": ["lastNotNull"] }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "expr": "timeguild_span_duration_seconds_p95",
+              "legendFormat": "{{journey}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Span Latency Comparison (Bar Chart)",
+          "type": "barchart"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 2, "w": 24, "x": 0, "y": 16 },
+          "id": 408,
+          "title": "🔎 Trace & Log Correlation (Loki Log Stream with Trace IDs)",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 18 },
+          "id": 409,
+          "options": {
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "showLabels": true,
+            "showLineNumbers": true,
+            "showWrap": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "loki" },
+              "expr": "{container=~\"timeguild.*\"} |= \"[OBSERVABILITY]\"",
+              "refId": "A"
+            }
+          ],
+          "title": "Structured Log Stream with OpenTelemetry trace_id & span_id",
+          "type": "logs"
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": ["timeguild", "apm", "opentelemetry", "tracing"],
+      "time": { "from": "now-1h", "to": "now" },
+      "timepicker": { "refresh_intervals": ["5s", "10s", "30s", "1m"] },
+      "timezone": "browser",
+      "title": "Time Guild - OpenTelemetry APM & Distributed Tracing",
+      "uid": "timeguild-apm-tracing",
+      "version": 1
+    }

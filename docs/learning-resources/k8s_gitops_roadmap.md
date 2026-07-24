@@ -6,7 +6,7 @@ This roadmap details the step-by-step transition from a **local Docker Compose**
 
 ## Maturity Roadmap Overview
 
-We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 17 are fully COMPLETED**, **Day 18 is the NEXT ACTIVE PHASE (In Progress)**, and **Days 19 through 20 are FUTURE PHASES**.
+We have successfully built a highly resilient, multi-tenant scheduling marketplace. Currently, **Day 1 to Day 15 and Day 17 are fully COMPLETED**, **Day 16 is the CURRENT ACTIVE PHASE (In Progress)**, and **Days 18 through 20 are FUTURE PHASES**.
 
 ```text
                [ Day 1 - Day 5: Core Infrastructure Setup ] (Completed)
@@ -39,13 +39,13 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
                  [ Day 15: Nginx Edge Proxy, Rate Limiting, & WAF Security Telemetry ] (Completed & Verified)
                                    │
                                    ▼
-                 [ Day 16: OpenTelemetry Distributed Tracing & Unified APM ] (Completed & Verified)
-                                   │
-                                   ▼
                  [ Day 17: AI FinOps, Token Cost Tracing & Security Guardrails ] (Completed & Verified)
                                    │
                                    ▼
-                 [ Day 18: Model Context Protocol (MCP) Integration Infrastructure ] (Next Active Phase - In Progress)
+                 [ Day 16: OpenTelemetry Distributed Tracing & Unified APM ] (Current Active Phase - In Progress)
+                                   │
+                                   ▼
+                 [ Day 18: Model Context Protocol (MCP) Integration Infrastructure ] (Future Phase - Outstanding)
                                    │
                                    ▼
                  [ Day 19: K8s AI Workload Hardening & Outcome-Based Analytics ] (Future Phase - Outstanding)
@@ -190,7 +190,7 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
 
 ---
 
-## Day 16 — OpenTelemetry Distributed Tracing & Unified APM (NEXT ACTIVE PHASE - OUTSTANDING)
+## Day 16 — OpenTelemetry Distributed Tracing & Unified APM (CURRENT ACTIVE PHASE - IN PROGRESS)
 * **Goal**: Trace complete end-to-end user transactions across Next.js API endpoints, Stripe Webhooks, database queries, and async jobs.
 * **Tasks**:
   1. **OpenTelemetry Node SDK Setup**: Integrate `@opentelemetry/sdk-node` into Next.js `instrumentation.ts`.
@@ -209,7 +209,7 @@ We have successfully built a highly resilient, multi-tenant scheduling marketpla
 
 ---
 
-## Day 18 — Model Context Protocol (MCP) Integration Infrastructure (NEXT ACTIVE PHASE - OUTSTANDING)
+## Day 18 — Model Context Protocol (MCP) Integration Infrastructure (FUTURE PHASE - OUTSTANDING)
 * **Goal**: Adopt Model Context Protocol (MCP) to allow platform AI agents to securely connect to external tools and data sources.
 * **Tasks**:
   1. **MCP Server Integration**: Author `src/lib/mcp/server.ts` exposing Time Guild primitives (bookings, slots, creator profiles, metrics) as standard MCP tools.
