@@ -49,6 +49,7 @@ data:
             "defaults": {
               "color": { "mode": "thresholds" },
               "description": "Total cumulative count of OpenTelemetry spans exported via OTLP to Jaeger.",
+              "displayName": "Total Spans Exported",
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
@@ -59,7 +60,7 @@ data:
               "unit": "short"
             }
           },
-          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 2 },
+          "gridPos": { "h": 5, "w": 6, "x": 0, "y": 2 },
           "id": 401,
           "options": {
             "colorMode": "value",
@@ -67,7 +68,7 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "textMode": "value"
+            "textMode": "value_and_name"
           },
           "pluginVersion": "10.0.0",
           "targets": [
@@ -80,7 +81,7 @@ data:
               "refId": "A"
             }
           ],
-          "title": "Total Spans Exported (OTLP)",
+          "title": "Total Spans",
           "type": "stat"
         },
         {
@@ -89,6 +90,7 @@ data:
             "defaults": {
               "color": { "mode": "thresholds" },
               "description": "95th percentile latency of Stripe Express creator payout transfer execution (stripe.transfers.create).",
+              "displayName": "Creator Payout (P95)",
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
@@ -101,7 +103,7 @@ data:
               "unit": "s"
             }
           },
-          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 2 },
+          "gridPos": { "h": 5, "w": 6, "x": 6, "y": 2 },
           "id": 402,
           "options": {
             "colorMode": "value",
@@ -109,7 +111,7 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "textMode": "value"
+            "textMode": "value_and_name"
           },
           "pluginVersion": "10.0.0",
           "targets": [
@@ -122,7 +124,7 @@ data:
               "refId": "A"
             }
           ],
-          "title": "Creator Payout Latency (P95)",
+          "title": "Payout Latency",
           "type": "stat"
         },
         {
@@ -131,6 +133,7 @@ data:
             "defaults": {
               "color": { "mode": "thresholds" },
               "description": "95th percentile latency of DeepSeek / LangGraph multi-agent scheduling graph execution.",
+              "displayName": "AI Scheduling (P95)",
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
@@ -143,7 +146,7 @@ data:
               "unit": "s"
             }
           },
-          "gridPos": { "h": 4, "w": 6, "x": 12, "y": 2 },
+          "gridPos": { "h": 5, "w": 6, "x": 12, "y": 2 },
           "id": 403,
           "options": {
             "colorMode": "value",
@@ -151,7 +154,7 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "textMode": "value"
+            "textMode": "value_and_name"
           },
           "pluginVersion": "10.0.0",
           "targets": [
@@ -164,7 +167,7 @@ data:
               "refId": "A"
             }
           ],
-          "title": "AI Agent Scheduling Latency (P95)",
+          "title": "Agent Latency",
           "type": "stat"
         },
         {
@@ -173,6 +176,7 @@ data:
             "defaults": {
               "color": { "mode": "thresholds" },
               "description": "95th percentile latency of Stripe Checkout session creation and slot locking.",
+              "displayName": "Stripe Checkout (P95)",
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
@@ -183,7 +187,7 @@ data:
               "unit": "s"
             }
           },
-          "gridPos": { "h": 4, "w": 6, "x": 18, "y": 2 },
+          "gridPos": { "h": 5, "w": 6, "x": 18, "y": 2 },
           "id": 404,
           "options": {
             "colorMode": "value",
@@ -191,7 +195,7 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "textMode": "value"
+            "textMode": "value_and_name"
           },
           "pluginVersion": "10.0.0",
           "targets": [
@@ -204,12 +208,12 @@ data:
               "refId": "A"
             }
           ],
-          "title": "Stripe Checkout Latency (P95)",
+          "title": "Checkout Latency",
           "type": "stat"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 2, "w": 24, "x": 0, "y": 6 },
+          "gridPos": { "h": 2, "w": 24, "x": 0, "y": 7 },
           "id": 405,
           "title": "📈 Transaction Latency Trends & Cross-Journey Comparison",
           "type": "row"
@@ -228,7 +232,7 @@ data:
               "unit": "s"
             }
           },
-          "gridPos": { "h": 8, "w": 14, "x": 0, "y": 8 },
+          "gridPos": { "h": 8, "w": 14, "x": 0, "y": 9 },
           "id": 406,
           "options": {
             "legend": { "displayMode": "table", "placement": "bottom" },
@@ -287,7 +291,7 @@ data:
               "unit": "s"
             }
           },
-          "gridPos": { "h": 8, "w": 10, "x": 14, "y": 8 },
+          "gridPos": { "h": 8, "w": 10, "x": 14, "y": 9 },
           "id": 407,
           "options": {
             "displayMode": "lcd",
@@ -342,12 +346,12 @@ data:
               "refId": "E"
             }
           ],
-          "title": "Span Latency Comparison by Journey (LCD Meter)",
+          "title": "Span Latency Comparison by Journey",
           "type": "bargauge"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 2, "w": 24, "x": 0, "y": 16 },
+          "gridPos": { "h": 2, "w": 24, "x": 0, "y": 17 },
           "id": 408,
           "title": "🔎 Trace & Log Correlation (Loki Log Stream with Trace IDs)",
           "type": "row"
@@ -359,7 +363,7 @@ data:
               "description": "Real-time Loki log stream filtered for structured [OBSERVABILITY] events containing active trace_id and span_id correlation parameters."
             }
           },
-          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 18 },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 19 },
           "id": 409,
           "options": {
             "dedupStrategy": "none",
@@ -389,5 +393,5 @@ data:
       "timezone": "browser",
       "title": "Time Guild - OpenTelemetry APM & Distributed Tracing",
       "uid": "timeguild-apm-tracing",
-      "version": 3
+      "version": 4
     }
