@@ -14,19 +14,23 @@ As multi-tenant routing, Stripe webhooks, and multi-agent AI interactions scale,
 
 ## 2. Core Tasks
 
-### A. OpenTelemetry Node SDK Setup
-* Configure `@opentelemetry/sdk-node` and `@opentelemetry/auto-instrumentations-node` in Next.js `instrumentation.ts`.
-* Enable trace propagation headers (`traceparent`, `tracestate`) across all internal HTTP calls and API endpoints.
+### A. OpenTelemetry Node SDK Setup (COMPLETED)
+* Configured `@opentelemetry/sdk-node` and `@opentelemetry/auto-instrumentations-node` in Next.js `src/instrumentation.ts`.
+* Enabled trace propagation headers (`traceparent`, `tracestate`) across all internal HTTP calls and API endpoints.
 
-### B. User Journey Span Instrumentation
-Instrument custom spans to track key business transactions:
+### B. User Journey Span Instrumentation (COMPLETED)
+Instrumented custom spans in `src/lib/tracing.ts` to track key business transactions:
 * **Creator Onboarding & Provisioning**: Trace tenant registration → K8s namespace creation → DB initialization.
 * **Booking & Payment Journey**: Trace availability lookup → LangGraph agent routing → Stripe Checkout creation → Webhook processing → Express account payout transfer.
 
-### C. Jaeger / Tempo & Grafana APM Integration
-* Export traces via OTLP gRPC/HTTP collectors to Jaeger or Grafana Tempo.
-* Connect trace data with Loki logs and Prometheus metrics in Grafana for unified APM visualization.
-* Configure automated alerts for P95 latency breaches (>500ms) on critical payment endpoints.
+### C. Jaeger / Tempo & Grafana APM Integration (COMPLETED)
+* Export traces via OTLP gRPC/HTTP collectors to Jaeger or Grafana Tempo (`http://jaeger:4318/v1/traces`).
+* Connected trace data with Loki logs and Prometheus metrics in Grafana for unified APM visualization.
+* Configured automated alerts for P95 latency breaches (>500ms) on critical payment endpoints.
+
+### D. Booking Flow UI & AI Approval CTA Validation (CURRENT ACTIVE SUB-TASK - IN PROGRESS)
+* Overhauled booking dialog layout, date/time slot grid typography, and AI approval CTA flow (`src/app/creator/[id]/page.tsx`).
+* Currently validating UI responsiveness and user experience during end-to-end trace testing.
 
 ---
 
