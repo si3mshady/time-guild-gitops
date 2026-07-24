@@ -262,7 +262,7 @@ data:
           "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
           "id": 407,
           "options": {
-            "displayMode": "gradient",
+            "displayMode": "lcd",
             "orientation": "horizontal",
             "reduceOptions": {
               "calcs": ["lastNotNull"],
