@@ -9,7 +9,7 @@ config:
 
 ingress:
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: null
   className: "nginx" # Use production Nginx controller class instead of Traefik
   hosts:
     - host: prod.timeguild.xyz
