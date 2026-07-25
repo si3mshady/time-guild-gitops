@@ -1,4 +1,4 @@
-replicaCount: 3
+replicaCount: 1
 
 # Disable Stripe simulation sandbox mode for live transactions in production
 config:
