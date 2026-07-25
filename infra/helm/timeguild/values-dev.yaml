@@ -5,7 +5,7 @@ autoscaling:
 
 ingress:
   annotations:
-    cert-manager.io/cluster-issuer: null
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
     - host: timeguild.xyz
       paths:
@@ -16,7 +16,8 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - hosts:
+    - secretName: wildcard-tls-secret
+      hosts:
         - timeguild.xyz
         - "*.timeguild.xyz"
 

@@ -2,7 +2,7 @@ replicaCount: 2
 
 ingress:
   annotations:
-    cert-manager.io/cluster-issuer: null
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
     - host: lab.timeguild.xyz
       paths:
@@ -13,7 +13,8 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - hosts:
+    - secretName: wildcard-tls-secret
+      hosts:
         - lab.timeguild.xyz
         - "*.lab.timeguild.xyz"
 

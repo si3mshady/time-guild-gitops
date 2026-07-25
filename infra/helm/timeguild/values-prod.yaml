@@ -8,6 +8,8 @@ config:
   NEXT_PUBLIC_STRIPE_TEST_MODE: "false"
 
 ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   className: "nginx" # Use production Nginx controller class instead of Traefik
   hosts:
     - host: prod.timeguild.xyz
@@ -19,7 +21,7 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: timeguild-prod-tls
+    - secretName: wildcard-tls-secret
       hosts:
         - prod.timeguild.xyz
         - "*.prod.timeguild.xyz"
