@@ -3,7 +3,7 @@ replicaCount: 2
 image:
   repository: si3mshady/time-guild
   pullPolicy: IfNotPresent
-  tag: "sha-63a1334"
+  tag: "latest"
 
 serviceAccount:
   create: true
@@ -43,7 +43,7 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: timeguild-tls-secret
+    - secretName: wildcard-tls-secret
       hosts:
         - timeguild.xyz
         - "*.timeguild.xyz"
