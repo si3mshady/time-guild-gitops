@@ -1,5 +1,8 @@
 replicaCount: 1
 
+podSecurityContext:
+  runAsNonRoot: false
+
 # Disable Stripe simulation sandbox mode for live transactions in production
 config:
   NEXT_PUBLIC_STRIPE_TEST_MODE: "false"
