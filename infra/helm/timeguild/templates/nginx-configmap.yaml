@@ -183,5 +183,10 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $connection_upgrade;
+
+            # Enforce zero browser caching on HTML page routes to guarantee fresh UI/UX
+            add_header Cache-Control "no-cache, no-store, must-revalidate, max-age=0" always;
+            add_header Pragma "no-cache" always;
+            add_header Expires "0" always;
         }
     }
