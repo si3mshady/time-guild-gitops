@@ -14,4 +14,3 @@ data:
   SUPABASE_URL: {{ .Values.config.SUPABASE_URL | quote }}
   DB_PATH: {{ .Values.config.DB_PATH | quote }}
   OTEL_SERVICE_NAME: "timeguild-app"
-  OTEL_EXPORTER_OTLP_ENDPOINT: "http://prometheus-stack-grafana.timeguild-monitoring.svc.cluster.local:80"
