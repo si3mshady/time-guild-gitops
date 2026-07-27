@@ -1,26 +1,26 @@
-# Day 23 Action Plan & Architecture Roadmap: TimeWorth Mobile Native App Strategy (React Native / Expo)
+# Day 23 Action Plan & Architecture Roadmap: Twilio Production Telephony, A2P 10DLC & Masked Contact Proxy
 
 > **Date:** July 30, 2026  
 > **Status:** PLANNED & SCHEDULED 🟡  
-> **Target Release:** Day 23  
+> **Target Release:** Day 23 (Pre-Beta Hardening Sprint 3)  
 
 ---
 
 ## 🎯 Executive Summary & Day 23 Objectives
 
-**Day 23** focuses on defining the mobile expansion strategy and scaffolding the React Native / Expo mobile app architecture:
+**Day 23** configures production-ready telephony and privacy-preserving communications via Twilio:
 
-1. **`TIME-220` – Mobile PWA & React Native / Expo Architecture Blueprint**: Scaffold Expo SDK 51 mobile app project and link shared TypeScript API types between Next.js web and Expo mobile.
-2. **`TIME-221` – Native Push Notifications for Instant PIN Handshake & Session Alerts**: Integrate `@expo/notifications` with APNs (Apple) and FCM (Firebase/Android) to send instant push alerts when sessions are booked or ready for PIN check-in.
-3. **`TIME-222` – Mobile Wallet One-Tap Checkout (Apple Pay & Google Pay)**: Integrate `@stripe/stripe-react-native` PaymentSheet enabling one-tap Apple Pay and Google Pay checkouts with escrow `transfer_group` tracking.
+1. **`TIME-210` – Twilio Console Corporate Brand & A2P 10DLC Campaign Registration**: Submit corporate brand details and register 10DLC Messaging Campaign in Twilio Trust Hub to optimize carrier pass-through fees and prevent SMS filtering.
+2. **`TIME-211` – Twilio Conversation Relay AI Screening Voice Webhook Hookup**: Point Twilio Studio Phone Number webhooks to `/api/voice/[tenantId]` for real-time AI phone screening and SMS Checkout link dispatch.
+3. **`TIME-212` – Double-Blind Virtual Phone Number Pooling & Proxy Routing**: Configure Twilio Messaging/Voice Webhook URLs to point to `/api/voice/proxy`, routing calls and SMS through virtual proxy numbers during active booking windows.
 
 ---
 
 ## 📋 Jira Story Alignment
 
-* **`TIME-220`** (`8 pts`): Mobile PWA & React Native / Expo Architecture Blueprint
-* **`TIME-221`** (`5 pts`): Native Mobile Push Notifications for Instant PIN Handshake & Session Alerts
-* **`TIME-222`** (`5 pts`): Mobile Wallet One-Tap Checkout (Apple Pay & Google Pay)
+* **`TIME-210`** (`8 pts`): Twilio Console Corporate Brand & A2P 10DLC Campaign Setup
+* **`TIME-211`** (`5 pts`): Twilio Conversation Relay AI Screening Voice Webhook Hookup
+* **`TIME-212`** (`5 pts`): Double-Blind Virtual Phone Number Pooling & Proxy Routing
 
 ---
 
@@ -29,7 +29,7 @@
 ```text
 TASK                                           VERIFICATION METHOD                       STATUS
 ---------------------------------------------------------------------------------------------------
-1. Expo Mobile Project Scaffolding             npx expo start iOS/Android test            [ ] SCHEDULED
-2. Native Push Notification Trigger            Device push token registration check       [ ] SCHEDULED
-3. Apple Pay / Google Pay PaymentSheet         Stripe Mobile SDK PaymentSheet test        [ ] SCHEDULED
+1. A2P 10DLC Brand Submission                  Twilio Trust Hub Status                    [ ] SCHEDULED
+2. Voice Agent Webhook Hookup                  Live test call to /api/voice/[tenantId]    [ ] SCHEDULED
+3. Masked Proxy Webhook Routing                Inbound TwiML XML response test            [ ] SCHEDULED
 ```

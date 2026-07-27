@@ -1,26 +1,26 @@
-# Day 22 Action Plan & Architecture Roadmap: Twilio Production Telephony, A2P 10DLC & Masked Contact Proxy
+# Day 22 Action Plan & Architecture Roadmap: Admin Escrow PIN Force-Release & Dispute Resolution Engine
 
 > **Date:** July 29, 2026  
 > **Status:** PLANNED & SCHEDULED 🟡  
-> **Target Release:** Day 22  
+> **Target Release:** Day 22 (Pre-Beta Hardening Sprint 2)  
 
 ---
 
 ## 🎯 Executive Summary & Day 22 Objectives
 
-**Day 22** focuses on configuring production-ready telephony and privacy-preserving communications via Twilio:
+**Day 22** builds the administrative fallback mechanism required if a client loses their phone or fails to enter the 4-digit PIN after a completed session:
 
-1. **`TIME-210` – Twilio Console Corporate Brand & A2P 10DLC Campaign Registration**: Submit corporate brand details and register 10DLC Messaging Campaign in Twilio Trust Hub to optimize carrier pass-through fees and prevent SMS filtering.
-2. **`TIME-211` – Twilio Conversation Relay AI Screening Voice Webhook Hookup**: Point Twilio Studio Phone Number webhooks to `/api/voice/[tenantId]` for real-time AI phone screening and SMS Checkout link dispatch.
-3. **`TIME-212` – Double-Blind Virtual Phone Number Pooling & Proxy Routing**: Configure Twilio Messaging/Voice Webhook URLs to point to `/api/voice/proxy`, routing calls and SMS through virtual proxy numbers during active booking windows.
+1. **Admin Force-Release Endpoint (`POST /api/admin/bookings/force-payout`)**: Build a secure admin endpoint to manually trigger `triggerSessionTransfer(bookingId)` after 48-hour session verification.
+2. **Admin PIN Override UI Button**: Render a `"Force Release Escrow"` action button in the Admin Bookings table in [src/app/dashboard/page.tsx](file:///home/si3mshady/time-guild/src/app/dashboard/page.tsx).
+3. **Escrow Audit Logging**: Record force-release events in the audit telemetry database with admin user ID and justification notes.
 
 ---
 
 ## 📋 Jira Story Alignment
 
-* **`TIME-210`** (`8 pts`): Twilio Console Corporate Brand & A2P 10DLC Campaign Setup
-* **`TIME-211`** (`5 pts`): Twilio Conversation Relay AI Screening Voice Webhook Hookup
-* **`TIME-212`** (`5 pts`): Double-Blind Virtual Phone Number Pooling & Proxy Routing
+* **`TIME-204`** (`5 pts`): Build `POST /api/admin/bookings/force-payout` Endpoint
+* **`TIME-205`** (`3 pts`): Render Admin Force-Release Button in Dashboard UI
+* **`TIME-206`** (`3 pts`): Audit Telemetry Logging for Manual Escrow Releases
 
 ---
 
@@ -29,7 +29,7 @@
 ```text
 TASK                                           VERIFICATION METHOD                       STATUS
 ---------------------------------------------------------------------------------------------------
-1. A2P 10DLC Brand Submission                  Twilio Trust Hub Status                    [ ] SCHEDULED
-2. Voice Agent Webhook Hookup                  Live test call to /api/voice/[tenantId]    [ ] SCHEDULED
-3. Masked Proxy Webhook Routing                Inbound TwiML XML response test            [ ] SCHEDULED
+1. Admin Force-Release Endpoint                POST /api/admin/bookings/force-payout      [ ] SCHEDULED
+2. Admin UI Button Integration                 Dashboard Admin Bookings Table Action      [ ] SCHEDULED
+3. Audit Log Recording                         Database audit log entry check             [ ] SCHEDULED
 ```

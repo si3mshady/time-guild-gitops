@@ -1,26 +1,26 @@
-# Day 21 Action Plan & Architecture Roadmap: E2E Marketplace QA, Concurrency & Dispute Stress Testing
+# Day 21 Action Plan & Architecture Roadmap: Webhook Security Hardening & Raw Signature Verification
 
 > **Date:** July 28, 2026  
 > **Status:** PLANNED & SCHEDULED 🟡  
-> **Target Release:** Day 21 (Test Day)  
+> **Target Release:** Day 21 (Pre-Beta Hardening Sprint 1)  
 
 ---
 
 ## 🎯 Executive Summary & Day 21 Objectives
 
-Following the successful implementation of Day 20 Stripe Connect marketplace hardiness, **Day 21** is dedicated as a full **End-to-End Testing & Quality Assurance Day**. The focus is validating the entire multi-tenant session lifecycle, PIN/GPS handshake verification, KYC slot gates, and dispute clawback workflows:
+As part of the even 5-day Pre-Beta Launch Ramp-Up, **Day 21** focuses on securing the payment gateway webhook infrastructure:
 
-1. **`TIME-201` – E2E Escrow Booking & Handshake PIN Verification**: Complete a full end-to-end booking on test creator `avery`, verifying atomic slot state transitions (`available` ➔ `reserved` ➔ `booked`) and executing the PIN/GPS handshake payout (`stripe.transfers.create`).
-2. **`TIME-202` – Stripe Connect KYC Gate & 403 Unverified Creator Validation**: Test slot creation with an unverified creator (`marcus`), confirming server-side `403 Forbidden` response and UI alert toast.
-3. **`TIME-203` – Webhook Dispute Reversal & Skipped Transfer Queue Stress Test**: Test mock `charge.dispute.created` webhook payloads to verify transfer reversals, and test the manual "Retry Transfer" button in the Admin Dashboard.
+1. **Strict Production Webhook Signature Verification**: Update [src/app/api/stripe/webhook/route.ts](file:///home/si3mshady/time-guild/src/app/api/stripe/webhook/route.ts) to enforce raw request signature verification via `stripe.webhooks.constructEvent`.
+2. **Rejection of Unsigned Payloads**: Eliminate unverified JSON parsing fallbacks in live and test modes, returning HTTP 400 `Webhook signature missing or invalid` for unverified requests.
+3. **Webhook Security Logging**: Record signature validation telemetry in the `webhook_logs` table.
 
 ---
 
 ## 📋 Jira Story Alignment
 
-* **`TIME-201`** (`5 pts`): End-to-End Escrow Booking & Handshake PIN Verification
-* **`TIME-202`** (`3 pts`): Stripe Connect KYC Gate & 403 Unverified Creator Validation
-* **`TIME-203`** (`5 pts`): Webhook Dispute Reversal & Skipped Transfer Queue Stress Test
+* **`TIME-201`** (`5 pts`): Enforce Raw Body Webhook Signature Verification in `/api/stripe/webhook`
+* **`TIME-202`** (`3 pts`): Reject Unsigned Webhook Payloads with HTTP 400 Response
+* **`TIME-203`** (`3 pts`): Add Webhook Security Validation Telemetry to Admin Stream
 
 ---
 
@@ -29,7 +29,7 @@ Following the successful implementation of Day 20 Stripe Connect marketplace har
 ```text
 TASK                                           VERIFICATION METHOD                       STATUS
 ---------------------------------------------------------------------------------------------------
-1. E2E Booking & PIN Handshake                 Stripe Checkout & verify-pin endpoint      [ ] SCHEDULED
-2. KYC Gate 403 Validation                     Unverified creator slot POST request       [ ] SCHEDULED
-3. Dispute Reversal & Skipped Queue            Mock webhook payload & Admin Retry UI      [ ] SCHEDULED
+1. Raw Signature ConstructEvent                Stripe Webhook Signature Verification      [ ] SCHEDULED
+2. Reject Unsigned Requests                    HTTP 400 Bad Request Test                  [ ] SCHEDULED
+3. Security Telemetry Logging                  webhook_logs Table Inspection              [ ] SCHEDULED
 ```
