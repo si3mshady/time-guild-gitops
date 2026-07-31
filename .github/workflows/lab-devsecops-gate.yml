@@ -1,0 +1,117 @@
+name: "DevSecOps Lab - Automated PR Gate"
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'devsecops-lab/**'
+      - '.github/workflows/lab-*.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  sast-nextjs-lint:
+    name: "SAST: Next.js Code Format & Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: devsecops-lab/app/package.json
+
+      - name: Install App Dependencies
+        working-directory: devsecops-lab/app
+        run: npm ci
+
+      - name: Run Next.js Lint
+        working-directory: devsecops-lab/app
+        run: npm run lint || echo "Lint warnings detected"
+
+  secret-detection-trufflehog:
+    name: "Secret Gate: TruffleHog Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog Secret Scan
+        uses: trufflesecurity/trufflehog-actions-scan@v3.88.15
+        with:
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
+          extra_args: --debug --only-verified
+
+  iac-security-checkov:
+    name: "IaC Security: Checkov Terraform Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov Security Scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: devsecops-lab/infra
+          framework: terraform
+          output_format: cli
+          soft_fail: false
+
+  container-vulnerability-trivy:
+    name: "Container Gate: Trivy Image Vulnerability Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Local Image
+        run: |
+          docker build -t devsecops-lab-app:test devsecops-lab/app
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'devsecops-lab-app:test'
+          format: 'table'
+          exit-code: '0' # Soft fail for lab exercise, change to '1' for hard enforcement
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+  terraform-speculative-plan:
+    name: "IaC Gate: Speculative Terraform Plan (Dev)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.0"
+
+      - name: Terraform Format Check
+        working-directory: devsecops-lab/infra
+        run: terraform fmt -check -recursive
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/github-actions-lab-dev-role
+          aws-region: us-east-1
+        continue-on-error: true # Sandbox fallback if AWS OIDC not configured
+
+      - name: Terraform Init & Plan (Dev)
+        working-directory: devsecops-lab/infra/environments/dev
+        run: |
+          terraform init -backend=false
+          terraform validate

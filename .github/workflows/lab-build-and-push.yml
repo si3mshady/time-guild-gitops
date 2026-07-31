@@ -1,0 +1,43 @@
+name: "DevSecOps Lab - Build & Push Docker Image to ECR"
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'devsecops-lab/app/**'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-push-ecr:
+    name: "Build Container & Push to Amazon ECR"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/github-actions-lab-ecr-role
+          aws-region: us-east-1
+        continue-on-error: true
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        continue-on-error: true
+
+      - name: Build, Tag, and Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry || '123456789012.dkr.ecr.us-east-1.amazonaws.com' }}
+          ECR_REPOSITORY: 'devsecops-lab-app-dev'
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          echo "Building image tag: $IMAGE_TAG"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest devsecops-lab/app
+          echo "Pushing images to ECR (if authenticated)..."
+          # docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          # docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest

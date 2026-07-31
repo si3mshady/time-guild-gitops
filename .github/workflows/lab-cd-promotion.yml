@@ -1,0 +1,96 @@
+name: "DevSecOps Lab - Multi-Environment CD Build Promotion"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'devsecops-lab/infra/**'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy-dev:
+    name: "Auto-Deploy -> Dev Environment"
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.0"
+
+      - name: Configure AWS Credentials (Dev OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV || 'arn:aws:iam::123456789012:role/github-actions-lab-dev-role' }}
+          aws-region: us-east-1
+        continue-on-error: true
+
+      - name: Terraform Init & Apply (Dev)
+        working-directory: devsecops-lab/infra/environments/dev
+        run: |
+          terraform init -backend=false
+          terraform validate
+          echo "Simulated: terraform apply -auto-approve -var='image_tag=${{ github.sha }}'"
+
+  deploy-staging:
+    name: "Auto-Deploy -> Staging Environment"
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.0"
+
+      - name: Configure AWS Credentials (Staging OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_STAGING || 'arn:aws:iam::123456789012:role/github-actions-lab-staging-role' }}
+          aws-region: us-east-1
+        continue-on-error: true
+
+      - name: Terraform Init & Apply (Staging)
+        working-directory: devsecops-lab/infra/environments/staging
+        run: |
+          terraform init -backend=false
+          terraform validate
+          echo "Simulated: terraform apply -auto-approve -var='image_tag=${{ github.sha }}'"
+
+  deploy-production:
+    name: "Gated Deploy -> Production Environment"
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production # Manual Approval Protection Gate configured in GitHub
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.0"
+
+      - name: Configure AWS Credentials (Prod OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD || 'arn:aws:iam::123456789012:role/github-actions-lab-prod-role' }}
+          aws-region: us-east-1
+        continue-on-error: true
+
+      - name: Terraform Init & Apply (Production)
+        working-directory: devsecops-lab/infra/environments/prod
+        run: |
+          terraform init -backend=false
+          terraform validate
+          echo "Simulated: terraform apply -auto-approve -var='image_tag=${{ github.sha }}'"
